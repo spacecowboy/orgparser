@@ -1,0 +1,32 @@
+# These should be
+# placed in the
+# orgfile root
+
+* one :o:
+One little piggy went to the bank
+
+** one one :oo:
+A second little piggy
+went to another
+bank
+
+*** one one one :ooo:
+A third little
+piggy wasn't
+that little
+
+** one two :ot:
+A boxing combination
+
+** one three :oT:
+
+Leading newline on me
+
+* two :t:
+- Number
+- After
+- One
+
+*** two skip one :TTT:
+Goes straight
+/to/ *one*.

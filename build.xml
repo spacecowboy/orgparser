@@ -1,0 +1,18 @@
+<project default="orgparser.jar">
+  <property name="build" value="build" />
+  <property name="src" value="src" />
+
+  <!-- Build and package into a jar file -->
+  <target name="orgparser.jar">
+    <mkdir dir="${build}/" />
+    <delete file="${build}/orgparser.jar" />
+    <javac srcdir="${src}/"
+           destdir="${build}/"
+           source="6"
+           target="6" />
+    <jar destfile="${build}/orgparser.jar"
+         basedir="${build}/" />
+    <copy file="${build}/orgparser.jar"
+          tofile="orgparser.jar" />
+  </target>
+</project>
