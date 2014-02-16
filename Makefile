@@ -4,10 +4,12 @@ SRC=$(wildcard src/org/cowboyprogrammer/org/*.java)
 TESTS=$(wildcard tests/*java)
 TESTCLASSES=$(addsuffix .class, $(basename $(TESTS)))
 
-test: orgparser.jar $(TESTCLASSES)
+test: build/orgparser.jar $(TESTCLASSES)
 	java -cp $(CLASSPATH) org.junit.runner.JUnitCore tests.OrgTests
 
-orgparser.jar: $(SRC)
+orgparser.jar: build/orgparser.jar
+
+build/orgparser.jar: $(SRC)
 	ant
 
 $(TESTCLASSES): orgparser.jar

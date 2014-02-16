@@ -6,7 +6,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 
-
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.FileNotFoundException;
@@ -18,7 +17,7 @@ import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-
+@RunWith(JUnit4.class)
 public class OrgTests {
 
   @Test
