@@ -31,6 +31,49 @@ public class OrgParser {
   }
 
   /**
+   * Returns a pattern that will match timestamps. Resulting groups
+   * are in order of appearance (only date is mandatory):
+   *
+   * date, day, time, timeend, repeat, warning
+   *
+   * Example containing all elements:
+   *
+   * <2013-12-31 Tue 12:21-14:59 +1w -2d>
+   *
+   * In this case, the following would be the matched groups:
+   *
+   * date = 2013-12-31
+   * day = Tue
+   * time = 12:21
+   * timeend = 14:59
+   * repeat = +1w
+   * warning = -2d
+   */
+  public static Pattern getTimestampPattern() {
+    final StringBuilder sb = new StringBuilder();
+    // Start
+    sb.append("^\\s*[\\[<]")
+    // Mandatory date
+      .append("(?<date>\\d\\d\\d\\d-\\d\\d-\\d\\d)")
+    // Optional start
+      .append("(")
+    // day, not number or space
+      .append("(\\s+(?<day>[^\\d\\s]+))?")
+    // time (optional duration)
+      .append("(\\s+(?<time>\\d\\d:\\d\\d)(-(?<timeend>\\d\\d:\\d\\d))?)?")
+    // repeater
+      .append("(\\s+(?<repeat>[\\.\\+]?\\+\\d+[dwmy]))?")
+    // warning
+      .append("(\\s+(?<warning>-\\d+[dwmy]))?")
+    // Optional end
+      .append(")?")
+    // End
+      .append("[\\]>]\\s*$");
+
+    return Pattern.compile(sb.toString());
+  }
+
+  /**
    * Given a tag-string like ':bob:alice:frank:', returns
    * a list splitted on :, e.g. [bob, alice, frank].
    *

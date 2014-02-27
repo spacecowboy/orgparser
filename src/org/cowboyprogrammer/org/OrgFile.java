@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
 
 import java.util.Stack;
 
@@ -19,7 +20,7 @@ public class OrgFile extends OrgNode {
    * orgnodes.
    */
   public static OrgFile createFrom(final String filename)
-    throws FileNotFoundException, IOException {
+    throws FileNotFoundException, IOException, ParseException {
 
     // Need these to handle file
     String line = null;
@@ -60,7 +61,7 @@ public class OrgFile extends OrgNode {
 
         } else {
           // Body of node - OK to place in file
-          stack.peek().body += line + "\n";
+          stack.peek().addBodyLine(line + "\n");
         }
 
       }

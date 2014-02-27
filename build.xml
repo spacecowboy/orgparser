@@ -1,9 +1,9 @@
-<project default="orgparser.jar">
-  <property name="build" value="build" />
-  <property name="src" value="src" />
+<project default="jar">
+<!--  <property name="build" value="build" />
+  <property name="src" value="src" /> -->
 
   <!-- Build and package into a jar file -->
-  <target name="orgparser.jar">
+<!--  <target name="orgparser.jar">
     <mkdir dir="${build}/" />
     <delete file="${build}/orgparser.jar" />
     <javac srcdir="${src}/"
@@ -15,4 +15,47 @@
     <copy file="${build}/orgparser.jar"
           tofile="orgparser.jar" />
   </target>
+-->
+
+ <!-- Sets variables which can later be used. -->
+  <!-- The value of a property is accessed via ${} -->
+  <property name="src.dir" location="src" />
+  <property name="lib.dir" location="lib" />
+  <property name="build.dir" location="build" />
+
+  <!--
+    Create a classpath container which can be later used in the ant task
+  -->
+  <path id="build.classpath">
+    <fileset dir="${lib.dir}">
+      <include name="joda-time-2.3.jar" />
+    </fileset>
+  </path>
+
+  <!-- Deletes the existing build directory-->
+  <target name="clean">
+    <delete dir="${build.dir}" />
+  </target>
+
+  <!-- Creates the  build  directory-->
+  <target name="makedir">
+    <mkdir dir="${build.dir}" />
+  </target>
+
+  <!-- Compiles the java code -->
+  <target name="compile" depends="clean, makedir">
+    <javac srcdir="${src.dir}" destdir="${build.dir}"
+           classpathref="build.classpath" />
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar destfile="${build.dir}/orgparser.jar"
+         basedir="${build.dir}/" />
+    <copy file="${build.dir}/orgparser.jar"
+          tofile="orgparser.jar" />
+  </target>
+
+  <target name="debug" depends="jar"/>
+  <target name="release" depends="jar"/>
+
 </project>

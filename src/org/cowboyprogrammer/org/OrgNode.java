@@ -1,15 +1,22 @@
 package org.cowboyprogrammer.org;
 
+import java.text.ParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.List;
 import java.util.ArrayList;
 
 public class OrgNode {
+  protected static final Pattern timestampPattern =
+    OrgParser.getTimestampPattern();
   // Parent node of this node
   public OrgNode parent = null;
   // A heading can have any number of sub-headings
   public final List<OrgNode> subNodes;
   // Tags defined on this node
   public final List<String> tags;
+  // Timestamps associated with entry
+  public List<OrgTimestamp> timestamps;
   // Heading level (number of stars). Must be greater than parent.
   // 0 only valid for file object
   public int level = 0;
@@ -18,9 +25,10 @@ public class OrgNode {
   // Title of heading (includes anything that was not parsed)
   public String title = "";
   // Body of entry
-  public String body = "";
+  protected String body = "";
 
   public OrgNode() {
+    timestamps = new ArrayList<OrgTimestamp>();
     subNodes = new ArrayList<OrgNode>();
     tags = new ArrayList<String>();
   }
@@ -33,6 +41,24 @@ public class OrgNode {
 
     for (final String tag: tags) {
       this.tags.add(tag);
+    }
+  }
+
+  public void addBodyLine(final String line) throws ParseException {
+    // If empty, then we can add timestamps
+    if (body.isEmpty() || body.matches("\\A\\s*\\z")) {
+      final Matcher m = timestampPattern.matcher(line);
+      if (m.matches()) {
+        System.out.println("Timestamp!");
+        // Don't keep spaces before timestamps
+        body = "";
+        timestamps.add(new OrgTimestamp(m));
+      } else {
+        // Just append
+        body += line;
+      }
+    } else {
+      body += line;
     }
   }
 

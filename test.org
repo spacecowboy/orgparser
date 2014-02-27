@@ -3,6 +3,12 @@
 # orgfile root
 
 * one :o:
+<2013-02-21>
+DEADLINE: <2014-02-26 Wed>
+SCHEDULED: [2014-02-26 Wed]
+<2014-02-26 Wed 17:00 -3w +2d>
+<2014-02-26 Wed 17:00-19:30 -3w +2d>
+
 One little piggy went to the bank
 
 ** one one :oo:
