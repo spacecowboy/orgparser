@@ -56,10 +56,23 @@ public class OrgTimestamp {
   }
 
   /**
+   * Parse an org-timestamp
+   */
+  public static OrgTimestamp fromString(final String s) {
+    final Matcher m = OrgParser.getTimestampPattern().matcher(s);
+    if (m.matches()) {
+      return new OrgTimestamp(m);
+    }
+    else {
+      return null;
+    }
+  }
+
+  /**
    * Matcher is expected to have the same groups as the pattern from
    * OrgParser will give.
    */
-  public OrgTimestamp (final Matcher m) throws ParseException {
+  public OrgTimestamp (final Matcher m) {
     this();
 
     date = INDATEFORMAT.parseLocalDateTime(m.group("date"));
@@ -86,8 +99,17 @@ public class OrgTimestamp {
   public void toNextRepeat() {
     if (repeater != null) {
       if (repeater.startsWith("++")) {
-        // Just get it into the future
-        date = LocalDateTime.now().plus(getFutureRepeat());
+        final LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(date)) {
+          // Just get it into the future
+          while (now.isAfter(date)) {
+            date = date.plus(repeatPeriod);
+          }
+        }
+        else {
+          // Already in future, just jump
+          date = date.plus(repeatPeriod);
+        }
       }
       else if (repeater.startsWith(".+")) {
         // Count from NOW
@@ -100,18 +122,6 @@ public class OrgTimestamp {
     else {
       // Throw exception? Return false?
     }
-  }
-
-  protected ReadablePeriod getFutureRepeat() {
-    return null;
-    //fromNow = repeat - ((now.field - date.field) % repeat)
-    //return fromNow
-    // ex days (use Days.daysBetween())
-    // 4 - ((13 - 4) % 4)
-    // 4 - ( 9 % 4)
-    // 4 - 1
-    // 3
-    // return 13 + 3 == 16
   }
 
   public LocalDateTime getWarningTime() {
@@ -135,7 +145,7 @@ public class OrgTimestamp {
     if ("+".equals(repeat.substring(1, 2))) {
       start = 2;
     }
-    repeatPeriod = parsePeriod(Integer.parseInt(repeat.substring(2, repeat.length() - 1)),
+    repeatPeriod = parsePeriod(Integer.parseInt(repeat.substring(start, repeat.length() - 1)),
                                 repeat.substring(repeat.length() - 1));
   }
 
@@ -159,6 +169,10 @@ public class OrgTimestamp {
     }
 
     return p;
+  }
+
+  public LocalDateTime getDate() {
+    return date;
   }
 
   /**

@@ -17,6 +17,7 @@ $(TESTCLASSES): $(TESTS) orgparser.jar
 clean:
 	rm -rf build
 	rm -rf tests/*.class
+	rm orgparser.jar
 
 # Pattern rule
 %.class: %.java

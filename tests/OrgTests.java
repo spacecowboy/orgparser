@@ -5,6 +5,7 @@ import org.cowboyprogrammer.org.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -17,6 +18,8 @@ import org.junit.Test;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import org.joda.time.LocalDateTime;
 
 @RunWith(JUnit4.class)
 public class OrgTests {
@@ -106,6 +109,33 @@ public class OrgTests {
   }
 
   @Test
+  public void testTimestampRangePattern() {
+    Pattern p = OrgParser.getTimestampRangePattern();
+    print(p.toString());
+    Matcher m = p.matcher("<2013-12-31 Tue 12:21>--<2014-02-28 Wed 19:21>");
+    assertTrue(m.matches());
+    assertEquals(m.group("startdate"), "2013-12-31");
+    assertEquals(m.group("startday"), "Tue");
+    assertEquals(m.group("starttime"), "12:21");
+    assertEquals(m.group("enddate"), "2014-02-28");
+    assertEquals(m.group("endday"), "Wed");
+    assertEquals(m.group("endtime"), "19:21");
+
+    m = p.matcher("<2013-12-31 12:21>--<2014-02-28 19:21>");
+    assertTrue(m.matches());
+    assertEquals(m.group("startdate"), "2013-12-31");
+    assertEquals(m.group("starttime"), "12:21");
+    assertEquals(m.group("enddate"), "2014-02-28");
+    assertEquals(m.group("endtime"), "19:21");
+
+    m = p.matcher("<2013-12-31>--<2014-02-28>");
+    assertTrue(m.matches());
+    assertEquals(m.group("startdate"), "2013-12-31");
+    assertEquals(m.group("enddate"), "2014-02-28");
+  }
+
+
+  @Test
   public void testTimestampPatternFull() {
     Pattern p = OrgParser.getTimestampPattern();
     Matcher m = p.matcher("<2013-12-31 Tue 12:21-14:59 ++1w -2d>");
@@ -193,6 +223,36 @@ public class OrgTests {
 
   @Test
   public void testTimestampToString4() throws Exception {
+    final String s = "<2013-12-31 12:30 ++4y>";
+    Pattern p = OrgParser.getTimestampPattern();
+    Matcher m = p.matcher(s);
+    assertTrue(m.matches());
+    OrgTimestamp ts = new OrgTimestamp(m);
+    final String res = ts.toString();
+    assertEquals("<2013-12-31 Tue 12:30 ++4y>", res);
+  }
+  @Test
+  public void testTimestampPattern4a() throws Exception {
+    final String s = "<2013-12-31 12:30 ++4m>";
+    Pattern p = OrgParser.getTimestampPattern();
+    Matcher m = p.matcher(s);
+    assertTrue(m.matches());
+    OrgTimestamp ts = new OrgTimestamp(m);
+    final String res = ts.toString();
+    assertEquals("<2013-12-31 Tue 12:30 ++4m>", res);
+  }
+  @Test
+  public void testTimestampPattern4b() throws Exception {
+    final String s = "<2013-12-31 12:30 ++4w>";
+    Pattern p = OrgParser.getTimestampPattern();
+    Matcher m = p.matcher(s);
+    assertTrue(m.matches());
+    OrgTimestamp ts = new OrgTimestamp(m);
+    final String res = ts.toString();
+    assertEquals("<2013-12-31 Tue 12:30 ++4w>", res);
+  }
+  @Test
+  public void testTimestampPattern4c() throws Exception {
     final String s = "<2013-12-31 12:30 ++4d>";
     Pattern p = OrgParser.getTimestampPattern();
     Matcher m = p.matcher(s);
@@ -201,6 +261,17 @@ public class OrgTests {
     final String res = ts.toString();
     assertEquals("<2013-12-31 Tue 12:30 ++4d>", res);
   }
+  @Test
+  public void testTimestampPattern4d() throws Exception {
+    final String s = "<2013-12-31 12:30 ++4h>";
+    Pattern p = OrgParser.getTimestampPattern();
+    Matcher m = p.matcher(s);
+    assertTrue(m.matches());
+    OrgTimestamp ts = new OrgTimestamp(m);
+    final String res = ts.toString();
+    assertEquals("<2013-12-31 Tue 12:30 ++4h>", res);
+  }
+
 
   @Test
   public void testTimestampToString5Dur() throws Exception {
@@ -231,6 +302,130 @@ public class OrgTests {
     assertEquals(30, ts.getWarningTime().getMinuteOfHour());
   }
 
+  @Test
+  public void testTimestampNextRepeatSimple() throws Exception {
+    // year
+    OrgTimestamp ts = OrgTimestamp.fromString("<2013-12-31 12:30 +1y>");
+    assertEquals(2013, ts.getDate().getYear());
+    ts.toNextRepeat();
+    assertEquals(2014, ts.getDate().getYear());
+    // month
+    ts.setRepeat("+1m");
+    assertEquals(12, ts.getDate().getMonthOfYear());
+    ts.toNextRepeat();
+    assertEquals(2015, ts.getDate().getYear());
+    assertEquals(1, ts.getDate().getMonthOfYear());
+    // week
+    ts.setRepeat("+1w");
+    assertEquals(31, ts.getDate().getDayOfMonth());
+    ts.toNextRepeat();
+    assertEquals(7, ts.getDate().getDayOfMonth());
+    assertEquals(2, ts.getDate().getMonthOfYear());
+    // day
+    ts.setRepeat("+1d");
+    ts.toNextRepeat();
+    assertEquals(8, ts.getDate().getDayOfMonth());
+    assertEquals(2, ts.getDate().getMonthOfYear());
+    // hour
+    ts.setRepeat("+1h");
+    assertEquals(12, ts.getDate().getHourOfDay());
+    ts.toNextRepeat();
+    assertEquals(8, ts.getDate().getDayOfMonth());
+    assertEquals(13, ts.getDate().getHourOfDay());
+
+  }
+
+  @Test
+  public void testTimestampNextRepeatFutureToday() throws Exception {
+    // year in the past
+    OrgTimestamp ts;
+    ts = OrgTimestamp.fromString("<2001-12-28 12:30 .+1y>");
+    final LocalDateTime now = LocalDateTime.now();
+    assertEquals(2001, ts.getDate().getYear());
+    ts.toNextRepeat();
+    assertTrue(now.getYear() <= ts.getDate().getYear());
+
+    ts = OrgTimestamp.fromString("<2001-12-28 12:30 .+1y>");
+    ts.setRepeat(".+1m");
+    ts.toNextRepeat();
+    assertTrue(now.getMonthOfYear() <= ts.getDate().getMonthOfYear());
+
+    ts = OrgTimestamp.fromString("<2001-12-28 12:30 .+1y>");
+    ts.setRepeat(".+1w");
+    ts.toNextRepeat();
+    assertTrue(now.getDayOfYear() <= ts.getDate().getDayOfYear());
+
+    ts = OrgTimestamp.fromString("<2001-12-28 12:30 .+1y>");
+    ts.setRepeat(".+1d");
+    ts.toNextRepeat();
+    if (now.getMonthOfYear() == ts.getDate().getMonthOfYear()) {
+      assertTrue(now.getDayOfMonth() <= ts.getDate().getDayOfMonth());
+    } else {
+      assertTrue(now.getDayOfMonth() > ts.getDate().getDayOfMonth());
+    }
+
+    ts = OrgTimestamp.fromString("<2001-12-28 12:30 .+1y>");
+    ts.setRepeat(".+1h");
+    ts.toNextRepeat();
+    if (now.getDayOfYear() == ts.getDate().getDayOfYear())
+      assertTrue(now.getHourOfDay() <= ts.getDate().getHourOfDay());
+    else
+      assertTrue(now.getHourOfDay() > ts.getDate().getHourOfDay());
+  }
+
+  @Test
+  public void testTimestampNextRepeatFuture() throws Exception {
+    // year in the past
+    OrgTimestamp ts;
+    ts = OrgTimestamp.fromString("<2001-12-28 12:30 ++1y>");
+    assertNotNull(ts);
+    final LocalDateTime now = LocalDateTime.now();
+    assertEquals(2001, ts.getDate().getYear());
+    ts.toNextRepeat();
+    assertTrue(ts.getDate().isAfter(now));
+    assertEquals(12, ts.getDate().getMonthOfYear());
+    assertEquals(28, ts.getDate().getDayOfMonth());
+    assertEquals(12, ts.getDate().getHourOfDay());
+    assertEquals(30, ts.getDate().getMinuteOfHour());
+
+    ts = OrgTimestamp.fromString("<2001-12-28 12:30 ++1m>");
+    assertNotNull(ts);
+    ts.toNextRepeat();
+    assertTrue(ts.getDate().isAfter(now));
+    assertEquals(28, ts.getDate().getDayOfMonth());
+    assertEquals(12, ts.getDate().getHourOfDay());
+    assertEquals(30, ts.getDate().getMinuteOfHour());
+
+    ts = OrgTimestamp.fromString("<2001-12-28 12:30 ++1w>");
+    assertNotNull(ts);
+    int day = ts.getDate().getDayOfWeek();
+    ts.toNextRepeat();
+    assertTrue(ts.getDate().isAfter(now));
+    assertEquals(day, ts.getDate().getDayOfWeek());
+    assertEquals(12, ts.getDate().getHourOfDay());
+    assertEquals(30, ts.getDate().getMinuteOfHour());
+
+    ts = OrgTimestamp.fromString("<2001-12-28 12:30 ++1d>");
+    assertNotNull(ts);
+    ts.toNextRepeat();
+    assertTrue(ts.getDate().isAfter(now));
+    assertEquals(12, ts.getDate().getHourOfDay());
+    assertEquals(30, ts.getDate().getMinuteOfHour());
+
+    ts = OrgTimestamp.fromString("<2001-12-28 12:30 ++1h>");
+    assertNotNull(ts);
+    ts.toNextRepeat();
+    assertTrue(ts.getDate().isAfter(now));
+    if (now.getMinuteOfHour() < 30) {
+      assertEquals(now.getHourOfDay(), ts.getDate().getHourOfDay());
+    } else if (now.getHourOfDay() + 1 < 24) {
+      assertEquals(now.getHourOfDay() + 1, ts.getDate().getHourOfDay());
+    }
+    else {
+       assertEquals(0, ts.getDate().getHourOfDay());
+    }
+    assertEquals(30, ts.getDate().getMinuteOfHour());
+  }
 
 
 /*

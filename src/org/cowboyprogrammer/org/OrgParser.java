@@ -62,7 +62,7 @@ public class OrgParser {
     // time (optional duration)
       .append("(\\s+(?<time>\\d\\d:\\d\\d)(-(?<timeend>\\d\\d:\\d\\d))?)?")
     // repeater
-      .append("(\\s+(?<repeat>[\\.\\+]?\\+\\d+[dwmy]))?")
+      .append("(\\s+(?<repeat>[\\.\\+]?\\+\\d+[hdwmy]))?")
     // warning
       .append("(\\s+(?<warning>-\\d+[dwmy]))?")
     // Optional end
@@ -72,6 +72,47 @@ public class OrgParser {
 
     return Pattern.compile(sb.toString());
   }
+
+/**
+ * For timestamps such as:
+ * <2014-01-28>--<2014-02-28>
+ */
+  public static Pattern getTimestampRangePattern() {
+    final StringBuilder sb = new StringBuilder();
+    // Start
+    sb.append("^\\s*[<]")
+    // Mandatory date
+      .append("(?<startdate>\\d\\d\\d\\d-\\d\\d-\\d\\d)")
+    // Optional start
+      .append("(")
+    // day, not number or space
+      .append("(\\s+(?<startday>[^\\d\\s]+))?")
+    // time
+      .append("(\\s+(?<starttime>\\d\\d:\\d\\d))?")
+    // Optional end
+      .append(")?")
+    // End
+      .append("[>]")
+    // Range
+      .append("--")
+    // Start2
+      .append("[<]")
+    // Mandatory date
+      .append("(?<enddate>\\d\\d\\d\\d-\\d\\d-\\d\\d)")
+    // Optional start
+      .append("(")
+    // day, not number or space
+      .append("(\\s+(?<endday>[^\\d\\s]+))?")
+    // time
+      .append("(\\s+(?<endtime>\\d\\d:\\d\\d))?")
+    // Optional end
+      .append(")?")
+    // End
+      .append("[>]\\s*$");
+
+    return Pattern.compile(sb.toString());
+  }
+
 
   /**
    * Given a tag-string like ':bob:alice:frank:', returns
