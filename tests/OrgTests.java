@@ -54,13 +54,13 @@ public class OrgTests {
   }
 
   @Test
-  @Ignore
   public void testfile() {
     final String fname = "test.org";
 
     try {
 
       final OrgFile root = OrgFile.createFrom(fname);
+      print("\n\n");
       print(root.treeToString());
 
 
@@ -166,6 +166,20 @@ public class OrgTests {
     assertEquals(m.group("repeat"), "++1w");
     assertEquals(m.group("warning"), "-2d");
   }
+
+  @Test
+  public void testTimestampPatternScheduled() {
+    Pattern p = OrgParser.getTimestampPattern();
+    Matcher m = p.matcher("SCHEDULED: <2013-12-31 Tue 12:21-14:59 ++1w -2d>");
+    assertTrue(m.matches());
+    assertEquals(m.group("date"), "2013-12-31");
+    assertEquals(m.group("day"), "Tue");
+    assertEquals(m.group("time"), "12:21");
+    assertEquals(m.group("timeend"), "14:59");
+    assertEquals(m.group("repeat"), "++1w");
+    assertEquals(m.group("warning"), "-2d");
+  }
+
 
   @Test
   public void testTimestampPatternMinimum() {

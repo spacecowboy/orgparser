@@ -9,6 +9,8 @@ import java.util.ArrayList;
 public class OrgNode {
   protected static final Pattern timestampPattern =
     OrgParser.getTimestampPattern();
+  protected static final Pattern timestampRangePattern =
+    OrgParser.getTimestampRangePattern();
   // Parent node of this node
   public OrgNode parent = null;
   // A heading can have any number of sub-headings
@@ -17,6 +19,7 @@ public class OrgNode {
   public final List<String> tags;
   // Timestamps associated with entry
   public List<OrgTimestamp> timestamps;
+  public List<OrgTimestampRange> timestampRanges;
   // Heading level (number of stars). Must be greater than parent.
   // 0 only valid for file object
   public int level = 0;
@@ -29,6 +32,7 @@ public class OrgNode {
 
   public OrgNode() {
     timestamps = new ArrayList<OrgTimestamp>();
+    timestampRanges = new ArrayList<OrgTimestampRange>();
     subNodes = new ArrayList<OrgNode>();
     tags = new ArrayList<String>();
   }
@@ -47,15 +51,21 @@ public class OrgNode {
   public void addBodyLine(final String line) throws ParseException {
     // If empty, then we can add timestamps
     if (body.isEmpty() || body.matches("\\A\\s*\\z")) {
-      final Matcher m = timestampPattern.matcher(line);
-      if (m.matches()) {
-        System.out.println("Timestamp!");
+      final Matcher mt = timestampPattern.matcher(line);
+      if (mt.matches()) {
         // Don't keep spaces before timestamps
         body = "";
-        timestamps.add(new OrgTimestamp(m));
+        timestamps.add(new OrgTimestamp(mt));
       } else {
-        // Just append
-        body += line;
+        final Matcher mr = timestampRangePattern.matcher(line);
+        if (mr.matches()) {
+          // Don't keep spaces before timestamps
+          body = "";
+          timestampRanges.add(new OrgTimestampRange(mr));
+        } else {
+          // Just append
+          body += line;
+        }
       }
     } else {
       body += line;
@@ -66,7 +76,18 @@ public class OrgNode {
    * Get body of this entry.
    */
   public String getBodyString() {
-    return this.body;
+    final StringBuilder sb = new StringBuilder();
+    for (OrgTimestamp t: timestamps) {
+      sb.append(t.toString())
+        .append("\n");
+    }
+    for (OrgTimestampRange t: timestampRanges) {
+      sb.append(t.toString())
+        .append("\n");
+    }
+
+    sb.append(this.body);
+    return sb.toString();
   }
 
   /**

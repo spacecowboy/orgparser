@@ -51,8 +51,12 @@ public class OrgParser {
    */
   public static Pattern getTimestampPattern() {
     final StringBuilder sb = new StringBuilder();
-    // Start
-    sb.append("^\\s*[\\[<]")
+    // start of line
+    sb.append("^")
+      // Optional type
+      .append("((?<type>SCHEDULED|DEADLINE):)?")
+    // Start of date
+      .append("\\s*(?<active>[\\[<])")
     // Mandatory date
       .append("(?<date>\\d\\d\\d\\d-\\d\\d-\\d\\d)")
     // Optional start

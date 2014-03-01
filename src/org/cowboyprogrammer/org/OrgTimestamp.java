@@ -77,6 +77,20 @@ public class OrgTimestamp {
 
     date = INDATEFORMAT.parseLocalDateTime(m.group("date"));
 
+    if ("[".equals(m.group("active"))) {
+      inactive = true;
+    }
+
+    if (null != m.group("type")) {
+      final String t = m.group("type");
+      if (t.equals("DEADLINE")) {
+        type = Type.DEADLINE;
+      }
+      else if (t.equals("SCHEDULED")) {
+        type = Type.SCHEDULED;
+      }
+    }
+
     if (null != m.group("time")) {
       final LocalTime time = INTIMEFORMAT.parseLocalTime(m.group("time"));
       date = date.withTime(time.getHourOfDay(), time.getMinuteOfHour(), 0 ,0);
