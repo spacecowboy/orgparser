@@ -111,8 +111,8 @@ public class OrgTests {
   @Test
   public void testTimestampRangePattern() {
     Pattern p = OrgParser.getTimestampRangePattern();
-    print(p.toString());
-    Matcher m = p.matcher("<2013-12-31 Tue 12:21>--<2014-02-28 Wed 19:21>");
+    String s = "<2013-12-31 Tue 12:21>--<2014-02-28 Wed 19:21>";
+    Matcher m = p.matcher(s);
     assertTrue(m.matches());
     assertEquals(m.group("startdate"), "2013-12-31");
     assertEquals(m.group("startday"), "Tue");
@@ -132,6 +132,25 @@ public class OrgTests {
     assertTrue(m.matches());
     assertEquals(m.group("startdate"), "2013-12-31");
     assertEquals(m.group("enddate"), "2014-02-28");
+  }
+
+  @Test
+  public void testTimestampRangeToString() {
+    final String sf = "<2013-12-31 Tue 12:21>--<2014-02-28 Fri 19:21>";
+    OrgTimestampRange tf = OrgTimestampRange.fromString(sf);
+    assertEquals(sf, tf.toString());
+
+    final String sd = "<2013-12-31 Tue>--<2014-02-28 Fri>";
+    OrgTimestampRange td = OrgTimestampRange.fromString(sd);
+    assertEquals(sd, td.toString());
+
+    // Incomplete ones
+    OrgTimestampRange t1 = OrgTimestampRange.fromString("<2013-12-31 Tue>--<2014-02-28 12:29>");
+    assertEquals(sd, t1.toString());
+
+    OrgTimestampRange t2 = OrgTimestampRange.fromString("<2013-12-31 13:25>--<2014-02-28>");
+    assertEquals(sd, t2.toString());
+
   }
 
 
