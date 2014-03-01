@@ -29,16 +29,15 @@ public class OrgTests {
 
   }
 
-
   static void print(final int... numbers) {
-    for (final int n: numbers) {
+    for (final int n : numbers) {
       System.out.println(n);
       System.out.print(" ");
     }
   }
 
   static void print(final Collection<String> strings) {
-    for (final String s: strings) {
+    for (final String s : strings) {
       System.out.print(s);
       System.out.print(" ");
     }
@@ -46,7 +45,7 @@ public class OrgTests {
   }
 
   static void print(final String... strings) {
-    for (final String s: strings) {
+    for (final String s : strings) {
       System.out.print(s);
       System.out.print(" ");
     }
@@ -63,15 +62,13 @@ public class OrgTests {
       print("\n\n");
       print(root.treeToString());
 
-
       OrgNode leaf = root;
       while (leaf != null) {
         print(leaf.getAllTags());
-        if (leaf.subNodes.isEmpty()) {
+        if (leaf.getSubNodes().isEmpty()) {
           leaf = null;
-        }
-        else {
-          leaf = leaf.subNodes.get(0);
+        } else {
+          leaf = leaf.getSubNodes().get(0);
         }
       }
 
@@ -145,14 +142,15 @@ public class OrgTests {
     assertEquals(sd, td.toString());
 
     // Incomplete ones
-    OrgTimestampRange t1 = OrgTimestampRange.fromString("<2013-12-31 Tue>--<2014-02-28 12:29>");
+    OrgTimestampRange t1 = OrgTimestampRange
+        .fromString("<2013-12-31 Tue>--<2014-02-28 12:29>");
     assertEquals(sd, t1.toString());
 
-    OrgTimestampRange t2 = OrgTimestampRange.fromString("<2013-12-31 13:25>--<2014-02-28>");
+    OrgTimestampRange t2 = OrgTimestampRange
+        .fromString("<2013-12-31 13:25>--<2014-02-28>");
     assertEquals(sd, t2.toString());
 
   }
-
 
   @Test
   public void testTimestampPatternFull() {
@@ -179,7 +177,6 @@ public class OrgTests {
     assertEquals(m.group("repeat"), "++1w");
     assertEquals(m.group("warning"), "-2d");
   }
-
 
   @Test
   public void testTimestampPatternMinimum() {
@@ -231,7 +228,6 @@ public class OrgTests {
     assertEquals("<2013-12-31 Tue>", res);
   }
 
-
   @Test
   public void testTimestampToString2() throws Exception {
     final String s = "<2013-12-31 12:30>";
@@ -264,6 +260,7 @@ public class OrgTests {
     final String res = ts.toString();
     assertEquals("<2013-12-31 Tue 12:30 ++4y>", res);
   }
+
   @Test
   public void testTimestampPattern4a() throws Exception {
     final String s = "<2013-12-31 12:30 ++4m>";
@@ -274,6 +271,7 @@ public class OrgTests {
     final String res = ts.toString();
     assertEquals("<2013-12-31 Tue 12:30 ++4m>", res);
   }
+
   @Test
   public void testTimestampPattern4b() throws Exception {
     final String s = "<2013-12-31 12:30 ++4w>";
@@ -284,6 +282,7 @@ public class OrgTests {
     final String res = ts.toString();
     assertEquals("<2013-12-31 Tue 12:30 ++4w>", res);
   }
+
   @Test
   public void testTimestampPattern4c() throws Exception {
     final String s = "<2013-12-31 12:30 ++4d>";
@@ -294,6 +293,7 @@ public class OrgTests {
     final String res = ts.toString();
     assertEquals("<2013-12-31 Tue 12:30 ++4d>", res);
   }
+
   @Test
   public void testTimestampPattern4d() throws Exception {
     final String s = "<2013-12-31 12:30 ++4h>";
@@ -305,7 +305,6 @@ public class OrgTests {
     assertEquals("<2013-12-31 Tue 12:30 ++4h>", res);
   }
 
-
   @Test
   public void testTimestampToString5Dur() throws Exception {
     final String s = "<2013-12-31 12:30-19:12 ++4d>";
@@ -316,9 +315,6 @@ public class OrgTests {
     final String res = ts.toString();
     assertEquals("<2013-12-31 Tue 12:30-19:12 ++4d>", res);
   }
-
-
-
 
   @Test
   public void testTimestampGetWarning() throws Exception {
@@ -453,30 +449,28 @@ public class OrgTests {
       assertEquals(now.getHourOfDay(), ts.getDate().getHourOfDay());
     } else if (now.getHourOfDay() + 1 < 24) {
       assertEquals(now.getHourOfDay() + 1, ts.getDate().getHourOfDay());
-    }
-    else {
-       assertEquals(0, ts.getDate().getHourOfDay());
+    } else {
+      assertEquals(0, ts.getDate().getHourOfDay());
     }
     assertEquals(30, ts.getDate().getMinuteOfHour());
   }
 
+  /*
+    public static void main(String[] args) {
+      //print("testing");
+      //print(OrgParser.getHeaderPattern("NEXT").toString());
+      //print(OrgParser.parseTags(":bob:alice:sting:").length);
+      //print(OrgParser.parseTags(":bob:alice:sting:"));
+      Pattern p = OrgParser.getHeaderPattern("NEXT");
+      Matcher m = p.matcher("* NEXT A simple title :bob:alice:");
+      while (m.find()) {
+        //print(m.group());
+        print("Stars: ", m.group("stars"));
+        print("Title: ", m.group("title"));
+        print("Todo: ", m.group("todo"));
+        print("Tags: ", m.group("tags"));
+      }
 
-/*
-  public static void main(String[] args) {
-    //print("testing");
-    //print(OrgParser.getHeaderPattern("NEXT").toString());
-    //print(OrgParser.parseTags(":bob:alice:sting:").length);
-    //print(OrgParser.parseTags(":bob:alice:sting:"));
-    Pattern p = OrgParser.getHeaderPattern("NEXT");
-    Matcher m = p.matcher("* NEXT A simple title :bob:alice:");
-    while (m.find()) {
-      //print(m.group());
-      print("Stars: ", m.group("stars"));
-      print("Title: ", m.group("title"));
-      print("Todo: ", m.group("todo"));
-      print("Tags: ", m.group("tags"));
-    }
-
-    testfile();
-    }*/
+      testfile();
+      }*/
 }

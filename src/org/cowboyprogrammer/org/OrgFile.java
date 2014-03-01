@@ -20,7 +20,7 @@ public class OrgFile extends OrgNode {
    * orgnodes.
    */
   public static OrgFile createFrom(final String filename)
-    throws FileNotFoundException, IOException, ParseException {
+      throws FileNotFoundException, IOException, ParseException {
 
     // Need these to handle file
     String line = null;
@@ -42,20 +42,20 @@ public class OrgFile extends OrgNode {
           // Header of node
           // Create new node
           final OrgNode node = new OrgNode();
-          node.level = m.group("stars").length();
-          node.title = m.group("title");
-          node.todo = m.group("todo");
+          node.setLevel(m.group("stars").length());
+          node.setTitle(m.group("title"));
+          node.setTodo(m.group("todo"));
           node.addTags(OrgParser.parseTags(m.group("tags")));
 
           // Find parent
-          while (node.level <= stack.peek().level) {
+          while (node.getLevel() <= stack.peek().getLevel()) {
             stack.pop();
           }
 
           // Assign parent
-          node.parent = stack.peek();
+          node.setParent(stack.peek());
           // Assign child
-          stack.peek().subNodes.add(node);
+          stack.peek().getSubNodes().add(node);
           // Add to stack
           stack.push(node);
 
@@ -66,7 +66,8 @@ public class OrgFile extends OrgNode {
 
       }
     } finally {
-      if (br != null) br.close();
+      if (br != null)
+        br.close();
     }
 
     return orgfile;
@@ -88,14 +89,16 @@ public class OrgFile extends OrgNode {
     BufferedWriter bw = null;
     try {
       final File file = new File(filename);
-      if (!file.exists()) file.createNewFile();
+      if (!file.exists())
+        file.createNewFile();
 
       bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
       // Write the org tree
       bw.write(this.treeToString());
 
     } finally {
-      if (bw != null) bw.close();
+      if (bw != null)
+        bw.close();
     }
   }
 }

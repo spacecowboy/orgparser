@@ -1,6 +1,5 @@
 package org.cowboyprogrammer.org;
 
-import java.text.ParseException;
 import java.util.regex.Matcher;
 
 import org.joda.time.ReadablePeriod;
@@ -19,40 +18,41 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class OrgTimestamp {
 
-  static final String OUTDATEFORMAT="yyyy-MM-dd EEE";
-  static final String OUTDATETIMEFORMAT="yyyy-MM-dd EEE HH:mm";
-  static final String OUTENDTIMEFORMAT="-HH:mm";
+  public static final String OUTDATEFORMAT = "yyyy-MM-dd EEE";
+  public static final String OUTDATETIMEFORMAT = "yyyy-MM-dd EEE HH:mm";
+  public static final String OUTENDTIMEFORMAT = "-HH:mm";
 
-  static final DateTimeFormatter INDATEFORMAT =
-    DateTimeFormat.forPattern("yyyy-MM-dd");
-  static final DateTimeFormatter INTIMEFORMAT =
-     DateTimeFormat.forPattern("HH:mm");
+  public static final DateTimeFormatter INDATEFORMAT = DateTimeFormat
+      .forPattern("yyyy-MM-dd");
+  public static final DateTimeFormatter INTIMEFORMAT = DateTimeFormat
+      .forPattern("HH:mm");
 
   public static enum Type {
     PLAIN, DEADLINE, SCHEDULED
   }
-  public Type type = Type.PLAIN;
+
+  private Type type = Type.PLAIN;
 
   // Please note that date represents local time
-  protected LocalDateTime date;
+  private LocalDateTime date;
   // Just the end time
-  protected LocalTime endTime = null;
+  private LocalTime endTime = null;
 
   // if timestamp includes a time. <2013-12-31> vs <2013-12-31 22:31>
-  public boolean hasTime = false;
+  private boolean hasTime = false;
 
   // Example: +3y or ++3d or .+3w
-  protected String repeater = null;
-  protected ReadablePeriod repeatPeriod = null;
+  private String repeater = null;
+  private ReadablePeriod repeatPeriod = null;
 
   // Example: -2d
-  protected String warning = null;
-  protected ReadablePeriod warningPeriod = null;
+  private String warning = null;
+  private ReadablePeriod warningPeriod = null;
 
   // Decides braces: (false) <> vs [] (true)
-  public boolean inactive = false;
+  private boolean inactive = false;
 
-  public OrgTimestamp () {
+  public OrgTimestamp() {
   }
 
   /**
@@ -62,8 +62,7 @@ public class OrgTimestamp {
     final Matcher m = OrgParser.getTimestampPattern().matcher(s);
     if (m.matches()) {
       return new OrgTimestamp(m);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -72,7 +71,7 @@ public class OrgTimestamp {
    * Matcher is expected to have the same groups as the pattern from
    * OrgParser will give.
    */
-  public OrgTimestamp (final Matcher m) {
+  public OrgTimestamp(final Matcher m) {
     this();
 
     date = INDATEFORMAT.parseLocalDateTime(m.group("date"));
@@ -85,19 +84,18 @@ public class OrgTimestamp {
       final String t = m.group("type");
       if (t.equals("DEADLINE")) {
         type = Type.DEADLINE;
-      }
-      else if (t.equals("SCHEDULED")) {
+      } else if (t.equals("SCHEDULED")) {
         type = Type.SCHEDULED;
       }
     }
 
     if (null != m.group("time")) {
       final LocalTime time = INTIMEFORMAT.parseLocalTime(m.group("time"));
-      date = date.withTime(time.getHourOfDay(), time.getMinuteOfHour(), 0 ,0);
+      date = date.withTime(time.getHourOfDay(), time.getMinuteOfHour(), 0, 0);
       hasTime = true;
 
       if (null != m.group("timeend")) {
-        endTime = INTIMEFORMAT.parseLocalTime(m.group("timeend"));
+        setEndTime(INTIMEFORMAT.parseLocalTime(m.group("timeend")));
       }
     }
 
@@ -110,6 +108,9 @@ public class OrgTimestamp {
     }
   }
 
+  /**
+   * Move this timestamp one repetition.
+   */
   public void toNextRepeat() {
     if (repeater != null) {
       if (repeater.startsWith("++")) {
@@ -119,38 +120,90 @@ public class OrgTimestamp {
           while (now.isAfter(date)) {
             date = date.plus(repeatPeriod);
           }
-        }
-        else {
+        } else {
           // Already in future, just jump
           date = date.plus(repeatPeriod);
         }
-      }
-      else if (repeater.startsWith(".+")) {
+      } else if (repeater.startsWith(".+")) {
         // Count from NOW
         date = LocalDateTime.now().plus(repeatPeriod);
-      }
-      else { // +
+      } else { // +
         date = date.plus(repeatPeriod);
       }
     }
-    else {
-      // Throw exception? Return false?
+  }
+  
+  /**
+   * Return the next repetition of this time, even if 
+   * it is already in the future. Null if no repeat.
+   */
+  public LocalDateTime getNextRepetition() {
+    if (repeater == null)
+      return null;
+    
+    final LocalDateTime now = LocalDateTime.now();
+    LocalDateTime next = date.withDayOfMonth(date.getDayOfMonth());
+    
+    if (repeater.startsWith("++")) {
+      if (now.isAfter(next)) {
+        // Just get it into the future
+        while (now.isAfter(next)) {
+          next = next.plus(repeatPeriod);
+        }
+      } else {
+        // Already in future, just jump
+        next = next.plus(repeatPeriod);
+      }
+    } else if (repeater.startsWith(".+")) {
+      // Count from NOW
+      next = now.plus(repeatPeriod);
+    } else { // + or
+      next = next.plus(repeatPeriod);
+    }
+    
+    return next;
+  }
+  
+  /**
+   * Returns null if no repeater is set. Otherwise the next repetition of this
+   * time which is in the future. If it is already in the future, it will
+   * return that.
+   */
+  public LocalDateTime getNextFutureRepetition() {
+    if (repeater == null) {
+      return null;
+    }
+    final LocalDateTime now = LocalDateTime.now();
+    if (now.isBefore(date)) {
+      // Already in future
+      return date;
+    }
+    // In this case, + and ++ have the same behaviour
+    if (repeater.startsWith("+")) {
+      LocalDateTime next = date.plus(repeatPeriod);
+      // Just get it into the future
+      while (now.isAfter(next)) {
+        next = next.plus(repeatPeriod);
+      }
+      return next;
+    } else {
+      // Count from NOW
+      return now.plus(repeatPeriod);
     }
   }
 
   public LocalDateTime getWarningTime() {
     if (warning != null) {
       return date.minus(warningPeriod);
-    } else {
-      // Throw exception? Return null? Return actual time?
     }
     return null;
   }
 
   public void setWarning(final String warning) {
     this.warning = warning;
-    warningPeriod = parsePeriod(Integer.parseInt(warning.substring(1, warning.length() - 1)),
-                                warning.substring(warning.length() - 1));
+    warningPeriod = parsePeriod(
+        Integer.parseInt(warning.substring(1, warning.length() - 1)),
+        warning.substring(warning.length() - 1));
   }
 
   public void setRepeat(final String repeat) {
@@ -159,8 +212,9 @@ public class OrgTimestamp {
     if ("+".equals(repeat.substring(1, 2))) {
       start = 2;
     }
-    repeatPeriod = parsePeriod(Integer.parseInt(repeat.substring(start, repeat.length() - 1)),
-                                repeat.substring(repeat.length() - 1));
+    repeatPeriod = parsePeriod(
+        Integer.parseInt(repeat.substring(start, repeat.length() - 1)),
+        repeat.substring(repeat.length() - 1));
   }
 
   protected ReadablePeriod parsePeriod(final int t, final String w) {
@@ -168,17 +222,13 @@ public class OrgTimestamp {
 
     if (w.equals("h")) {
       p = Hours.hours(t);
-    }
-    else if (w.equals("d")) {
+    } else if (w.equals("d")) {
       p = Days.days(t);
-    }
-    else if (w.equals("w")) {
+    } else if (w.equals("w")) {
       p = Weeks.weeks(t);
-    }
-    else if (w.equals("m")) {
+    } else if (w.equals("m")) {
       p = Months.months(t);
-    }
-    else {
+    } else {
       p = Years.years(t);
     }
 
@@ -213,8 +263,8 @@ public class OrgTimestamp {
     if (hasTime) {
       // With time
       sb.append(date.toString(OUTDATETIMEFORMAT));
-      if (endTime != null) {
-        sb.append(endTime.toString(OUTENDTIMEFORMAT));
+      if (getEndTime() != null) {
+        sb.append(getEndTime().toString(OUTENDTIMEFORMAT));
       }
     } else {
       // Only date
@@ -239,4 +289,53 @@ public class OrgTimestamp {
 
     return sb.toString();
   }
+
+  public Type getType() {
+    return type;
+  }
+
+  public void setType(final Type type) {
+    this.type = type;
+  }
+
+  public void setDate(final LocalDateTime date, final boolean withTime) {
+    if (date == null) {
+      throw new NullPointerException("Date can't be null!");
+    }
+    this.date = date;
+    hasTime = withTime;
+  }
+
+  public LocalTime getEndTime() {
+    return endTime;
+  }
+
+  public void setEndTime(final LocalTime endTime) {
+    this.endTime = endTime;
+  }
+
+  public boolean hasTime() {
+    return hasTime;
+  }
+
+  public String getRepeat() {
+    return repeater;
+  }
+
+  public ReadablePeriod getRepeatPeriod() {
+    return repeatPeriod;
+  }
+
+  public ReadablePeriod getWarningPeriod() {
+    return warningPeriod;
+  }
+
+  public boolean isInactive() {
+    return inactive;
+  }
+
+  public void setInactive(final boolean inactive) {
+    this.inactive = inactive;
+  }
+
 }
