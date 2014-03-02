@@ -14,7 +14,7 @@ public class OrgParser {
   public static Pattern getHeaderPattern(final String... todoKeys) {
     final StringBuilder sb = new StringBuilder();
     sb.append("^(?<stars>\\*+)"); // Leading stars
-    sb.append("(\\s+(?<todo>TODO|DONE"); // TODO and DONE hardcoded
+    sb.append("(?:\\s+(?<todo>TODO|DONE"); // TODO and DONE hardcoded
     for (final String key: todoKeys) {
       if (key.isEmpty()) continue;
       // Enforce upper case for keys
@@ -23,7 +23,7 @@ public class OrgParser {
     sb.append("))?"); // TODO keys are optional
     //sb.append("(?<prio>\\s+\\[#[A-C]\\])?"); // Optional priority
     sb.append("\\s+(?<title>.+?)"); // Title
-    sb.append("(\\s+(?<tags>:.+:))?"); // Optional Tags
+    sb.append("(?:\\s+(?<tags>:.+:))?"); // Optional Tags
     sb.append("\\s*$"); // End of line
     return Pattern.compile(sb.toString());
   }
@@ -52,21 +52,21 @@ public class OrgParser {
     // start of line
     sb.append("^")
       // Optional type
-      .append("((?<type>SCHEDULED|DEADLINE):)?")
+      .append("(?:(?<type>SCHEDULED|DEADLINE):)?")
     // Start of date
       .append("\\s*(?<active>[\\[<])")
     // Mandatory date
       .append("(?<date>\\d\\d\\d\\d-\\d\\d-\\d\\d)")
     // Optional start
-      .append("(")
+      .append("(?:")
     // day, not number or space
-      .append("(\\s+(?<day>[^\\d\\s]+))?")
+      .append("(?:\\s+(?<day>[^\\d\\s]+))?")
     // time (optional duration)
-      .append("(\\s+(?<time>\\d\\d:\\d\\d)(-(?<timeend>\\d\\d:\\d\\d))?)?")
+      .append("(?:\\s+(?<time>\\d\\d:\\d\\d)(?:-(?<timeend>\\d\\d:\\d\\d))?)?")
     // repeater
-      .append("(\\s+(?<repeat>[\\.\\+]?\\+\\d+[hdwmy]))?")
+      .append("(?:\\s+(?<repeat>[\\.\\+]?\\+\\d+[hdwmy]))?")
     // warning
-      .append("(\\s+(?<warning>-\\d+[dwmy]))?")
+      .append("(?:\\s+(?<warning>-\\d+[dwmy]))?")
     // Optional end
       .append(")?")
     // End
@@ -86,11 +86,11 @@ public class OrgParser {
     // Mandatory date
       .append("(?<startdate>\\d\\d\\d\\d-\\d\\d-\\d\\d)")
     // Optional start
-      .append("(")
+      .append("(?:")
     // day, not number or space
-      .append("(\\s+(?<startday>[^\\d\\s]+))?")
+      .append("(?:\\s+(?<startday>[^\\d\\s]+))?")
     // time
-      .append("(\\s+(?<starttime>\\d\\d:\\d\\d))?")
+      .append("(?:\\s+(?<starttime>\\d\\d:\\d\\d))?")
     // Optional end
       .append(")?")
     // End
@@ -102,11 +102,11 @@ public class OrgParser {
     // Mandatory date
       .append("(?<enddate>\\d\\d\\d\\d-\\d\\d-\\d\\d)")
     // Optional start
-      .append("(")
+      .append("(?:")
     // day, not number or space
-      .append("(\\s+(?<endday>[^\\d\\s]+))?")
+      .append("(?:\\s+(?<endday>[^\\d\\s]+))?")
     // time
-      .append("(\\s+(?<endtime>\\d\\d:\\d\\d))?")
+      .append("(?:\\s+(?<endtime>\\d\\d:\\d\\d))?")
     // Optional end
       .append(")?")
     // End
