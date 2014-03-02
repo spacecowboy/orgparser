@@ -44,6 +44,8 @@ public class OrgNode {
    * Add all tags.
    */
   public void addTags(final String... tags) {
+    if (tags == null) return;
+
     for (final String tag : tags) {
       this.tags.add(tag);
     }
@@ -57,7 +59,7 @@ public class OrgNode {
     // If empty, then we can add timestamps and comments
     if (body.isEmpty() || body.matches("\\A\\s*\\z")) {
       // Check if comment
-      if (line.startsWith("#")) {
+      if (line.startsWith("\\s*#")) {
         // It's a comment
         comments += line;
         return;
