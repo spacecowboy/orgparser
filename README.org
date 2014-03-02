@@ -1,0 +1,152 @@
+* orgparser
+
+A Java parser for org-mode files.
+
+** How the parser works
+
+*** Nodes
+
+A file is made up of one or several nodes. A node has a header and a
+body. A simple example would be:
+
+#+begin_src org
+* The header starts with one or more stars
+The body follows...
+#+end_src
+
+An OrgFile is a subclass of OrgNode. As a special case, an OrgFile
+does not have a header but it does have a body, which is possibly
+empty. It's not unusual to put comments at the top of the file with
+for example file-wide tags. An example of that would be:
+
+#+begin_src org
+# Anything put here will be placed in the body of the file
+#+TAGS: noexport draft
+
+* Header of a node
+Body of node
+#+end_src
+
+Nodes are placed as subnodes of the file. A node might itself have
+some subnodes:
+
+#+begin_src org
+* Root node
+  Body of root
+** Subnode 1
+   Body of sub1
+** Subnode 2
+   Body of sub2
+#+end_src
+
+When a file is parsed a recursive structure of nodes is created. The
+root is always an OrgFile object. You parse a file by calling the
+static *createFrom* method of the OrgFile class:
+
+#+begin_src java
+OrgFile orgFile = OrgFile.createFrom("/path/to/file.org");
+#+end_src
+
+**** Header parts
+
+A header consists of several parts and they are all available
+individually in the OrgNode object. A complete example is:
+
+#+begin_src org
+* TODO Title of header :tag1:tag2:
+#+end_src
+
+By default *TODO* and *DONE* are included as TODO-keywords and they
+can not be removed. There is support for adding additional
+TODO-keywords during parsing.
+
+Note that a priority is currently not parsed.
+
+**** Body parts
+
+A body consists of more than the raw text. Just as a file might have
+some commented properties, so might a subnode. It might also contain
+various kinds of timestamps. As a restriction, these fields may only
+occur before the body proper. Empty lines are ignored before the body
+(unless they are connected). The order of comments and timestamps (and
+empty lines) does not matter. The order when written back to file is:
+comments, timestamps, the body proper. Some examples:
+
+#+begin_src org
+* Minimal example
+# A leading comment followed by a timestamp
+<2013-12-24>
+Body text starts here.
+
+* Empty lines will be ignored
+
+# Comment
+
+<2014-12-13>
+
+Body will include the previous empty line.
+
+* Order of comments, timestamps and empty lines does not matter
+DEADLINE: <2013-12-12>
+#+TAGS: bob alice
+SCHEDULED: <2013-02-12>
+
+# Another comment
+Body starts here
+#+end_src
+
+*** Timestamps
+
+A lot of the code deals with handling the timestamps and their
+repetitions. A minimal example timestamp is:
+
+#+begin_src org
+<2014-02-28>
+#+end_src
+
+A maximum example timestamp is:
+
+#+begin_src org
+DEADLINE: <2014-02-28 Fri 09:00-12:00 +4w -1h>
+#+end_src
+
+This would define the following properties of an OrgTimestamp, where
+only /date/ is mandatory.
+
+| type    |   DEADLINE |
+| date    | 2014-02-28 |
+| time    |      09:00 |
+| endtime |      12:00 |
+| repeat  |        +4w |
+| warning |        -1h |
+
+The date and time are stored as a /Joda LocalDateTime/. The method
+/hasTime/ returns true if the time is set. If not, only the date
+should be used.
+
+The majority of the code deals with the repeater part of the
+timestamp. If this is set, the methods /toNextRepeat/, /getNextRepeat/
+and /getNextFutureRepetition/ can be used. /toNextRepeat/ deals with
+the three different types of repeater: "+", "++" and ".+".
+
+- + is just moves one step.
+- ++ moves forward as many steps as required to get it into the future.
+- .+ moves forward one step from today, as opposed to whatever date
+  currently is.
+
+**** Durations
+
+A special type of timestamp (though not a subclass of OrgTimestamp) is
+a duration, represented by OrgTimestampRange. Two examples of
+durations are:
+
+#+begin_src org
+<2014-01-01>--<2014-01-02>
+#+end_src
+
+#+begin_src org
+<2014-01-01 Tue 09:00>--<2014-01-02 Wed 17:00>
+#+end_src
+
+Only the dates are mandatory. This type of timestamp does not support
+repeating or warnings at this time.
