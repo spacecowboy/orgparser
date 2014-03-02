@@ -6,26 +6,29 @@ import java.util.regex.Pattern;
 
 public class OrgParser {
 
-  public static final String HEADER_STARS_GROUP = "stars";
-  public static final String HEADER_TODO_GROUP = "todo";
-  public static final String HEADER_TITLE_GROUP = "title";
-  public static final String HEADER_TAGS_GROUP = "tags";
+  /*
+   * Can't use named groups because they are not supported in Android.
+   */
+  public static final int HEADER_STARS_GROUP = 1;
+  public static final int HEADER_TODO_GROUP = 2;
+  public static final int HEADER_TITLE_GROUP = 3;
+  public static final int HEADER_TAGS_GROUP = 4;
 
-  public static final String TIMESTAMP_TYPE_GROUP = "type";
-  public static final String TIMESTAMP_ACTIVE_GROUP = "active";
-  public static final String TIMESTAMP_DATE_GROUP = "date";
-  public static final String TIMESTAMP_DAY_GROUP = "day";
-  public static final String TIMESTAMP_TIME_GROUP = "time";
-  public static final String TIMESTAMP_TIMEEND_GROUP = "timeend";
-  public static final String TIMESTAMP_WARNING_GROUP = "warning";
-  public static final String TIMESTAMP_REPEAT_GROUP = "repeat";
+  public static final int TIMESTAMP_TYPE_GROUP = 1;
+  public static final int TIMESTAMP_ACTIVE_GROUP = 2;
+  public static final int TIMESTAMP_DATE_GROUP = 3;
+  public static final int TIMESTAMP_DAY_GROUP = 4;
+  public static final int TIMESTAMP_TIME_GROUP = 5;
+  public static final int TIMESTAMP_TIMEEND_GROUP = 6;
+  public static final int TIMESTAMP_REPEAT_GROUP = 7;
+  public static final int TIMESTAMP_WARNING_GROUP = 8;
 
-  public static final String TIMESTAMPRANGE_STARTDATE_GROUP = "startdate";
-  public static final String TIMESTAMPRANGE_STARTDAY_GROUP = "startday";
-  public static final String TIMESTAMPRANGE_STARTTIME_GROUP = "starttime";
-  public static final String TIMESTAMPRANGE_ENDDATE_GROUP = "enddate";
-  public static final String TIMESTAMPRANGE_ENDDAY_GROUP = "endday";
-  public static final String TIMESTAMPRANGE_ENDTIME_GROUP = "endtime";
+  public static final int TIMESTAMPRANGE_STARTDATE_GROUP = 1;
+  public static final int TIMESTAMPRANGE_STARTDAY_GROUP = 2;
+  public static final int TIMESTAMPRANGE_STARTTIME_GROUP = 3;
+  public static final int TIMESTAMPRANGE_ENDDATE_GROUP = 4;
+  public static final int TIMESTAMPRANGE_ENDDAY_GROUP = 5;
+  public static final int TIMESTAMPRANGE_ENDTIME_GROUP = 6;
 
   /**
    * Get a regular expression pattern that includes all the possible
@@ -34,17 +37,17 @@ public class OrgParser {
    */
   public static Pattern getHeaderPattern(final String... todoKeys) {
     final StringBuilder sb = new StringBuilder();
-    sb.append("^(?<stars>\\*+)"); // Leading stars
-    sb.append("(?:\\s+(?<todo>TODO|DONE"); // TODO and DONE hardcoded
+    sb.append("^(\\*+)"); // Leading stars
+    sb.append("(?:\\s+(TODO|DONE"); // TODO and DONE hardcoded
     for (final String key: todoKeys) {
       if (key.isEmpty()) continue;
       // Enforce upper case for keys
       sb.append("|").append(key.toUpperCase()); // Add this key
     }
-    sb.append("))?"); // TODO keys are optional
+    sb.append("))?");
     //sb.append("(?<prio>\\s+\\[#[A-C]\\])?"); // Optional priority
-    sb.append("\\s+(?<title>.+?)"); // Title
-    sb.append("(?:\\s+(?<tags>:.+:))?"); // Optional Tags
+    sb.append("\\s+(.+?)"); // Title
+    sb.append("(?:\\s+(:.+:))?"); // Optional Tags
     sb.append("\\s*$"); // End of line
     return Pattern.compile(sb.toString());
   }
@@ -73,21 +76,21 @@ public class OrgParser {
     // start of line
     sb.append("^")
       // Optional type
-      .append("(?:(?<type>SCHEDULED|DEADLINE):)?")
+      .append("(?:(SCHEDULED|DEADLINE):)?")
     // Start of date
-      .append("\\s*(?<active>[\\[<])")
+      .append("\\s*([\\[<])")
     // Mandatory date
-      .append("(?<date>\\d\\d\\d\\d-\\d\\d-\\d\\d)")
+      .append("(\\d\\d\\d\\d-\\d\\d-\\d\\d)")
     // Optional start
       .append("(?:")
     // day, not number or space
-      .append("(?:\\s+(?<day>[^\\d\\s]+))?")
+      .append("(?:\\s+([^\\d\\s]+))?")
     // time (optional duration)
-      .append("(?:\\s+(?<time>\\d\\d:\\d\\d)(?:-(?<timeend>\\d\\d:\\d\\d))?)?")
+      .append("(?:\\s+(\\d\\d:\\d\\d)(?:-(\\d\\d:\\d\\d))?)?")
     // repeater
-      .append("(?:\\s+(?<repeat>[\\.\\+]?\\+\\d+[hdwmy]))?")
+      .append("(?:\\s+([\\.\\+]?\\+\\d+[hdwmy]))?")
     // warning
-      .append("(?:\\s+(?<warning>-\\d+[dwmy]))?")
+      .append("(?:\\s+(-\\d+[dwmy]))?")
     // Optional end
       .append(")?")
     // End
@@ -105,13 +108,13 @@ public class OrgParser {
     // Start
     sb.append("^\\s*[<]")
     // Mandatory date
-      .append("(?<startdate>\\d\\d\\d\\d-\\d\\d-\\d\\d)")
+      .append("(\\d\\d\\d\\d-\\d\\d-\\d\\d)")
     // Optional start
       .append("(?:")
     // day, not number or space
-      .append("(?:\\s+(?<startday>[^\\d\\s]+))?")
+      .append("(?:\\s+([^\\d\\s]+))?")
     // time
-      .append("(?:\\s+(?<starttime>\\d\\d:\\d\\d))?")
+      .append("(?:\\s+(\\d\\d:\\d\\d))?")
     // Optional end
       .append(")?")
     // End
@@ -121,13 +124,13 @@ public class OrgParser {
     // Start2
       .append("[<]")
     // Mandatory date
-      .append("(?<enddate>\\d\\d\\d\\d-\\d\\d-\\d\\d)")
+      .append("(\\d\\d\\d\\d-\\d\\d-\\d\\d)")
     // Optional start
       .append("(?:")
     // day, not number or space
-      .append("(?:\\s+(?<endday>[^\\d\\s]+))?")
+      .append("(?:\\s+([^\\d\\s]+))?")
     // time
-      .append("(?:\\s+(?<endtime>\\d\\d:\\d\\d))?")
+      .append("(?:\\s+(\\d\\d:\\d\\d))?")
     // Optional end
       .append(")?")
     // End
