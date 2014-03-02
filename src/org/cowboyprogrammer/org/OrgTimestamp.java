@@ -74,14 +74,14 @@ public class OrgTimestamp {
   public OrgTimestamp(final Matcher m) {
     this();
 
-    date = INDATEFORMAT.parseLocalDateTime(m.group("date"));
+    date = INDATEFORMAT.parseLocalDateTime(m.group(OrgParser.TIMESTAMP_DATE_GROUP));
 
-    if ("[".equals(m.group("active"))) {
+    if ("[".equals(m.group(OrgParser.TIMESTAMP_ACTIVE_GROUP))) {
       inactive = true;
     }
 
-    if (null != m.group("type")) {
-      final String t = m.group("type");
+    if (null != m.group(OrgParser.TIMESTAMP_TYPE_GROUP)) {
+      final String t = m.group(OrgParser.TIMESTAMP_TYPE_GROUP);
       if (t.equals("DEADLINE")) {
         type = Type.DEADLINE;
       } else if (t.equals("SCHEDULED")) {
@@ -89,22 +89,22 @@ public class OrgTimestamp {
       }
     }
 
-    if (null != m.group("time")) {
-      final LocalTime time = INTIMEFORMAT.parseLocalTime(m.group("time"));
+    if (null != m.group(OrgParser.TIMESTAMP_TIME_GROUP)) {
+      final LocalTime time = INTIMEFORMAT.parseLocalTime(m.group(OrgParser.TIMESTAMP_TIME_GROUP));
       date = date.withTime(time.getHourOfDay(), time.getMinuteOfHour(), 0, 0);
       hasTime = true;
 
-      if (null != m.group("timeend")) {
-        setEndTime(INTIMEFORMAT.parseLocalTime(m.group("timeend")));
+      if (null != m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP)) {
+        setEndTime(INTIMEFORMAT.parseLocalTime(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP)));
       }
     }
 
-    if (null != m.group("warning")) {
-      setWarning(m.group("warning"));
+    if (null != m.group(OrgParser.TIMESTAMP_WARNING_GROUP)) {
+      setWarning(m.group(OrgParser.TIMESTAMP_WARNING_GROUP));
     }
 
-    if (null != m.group("repeat")) {
-      setRepeat(m.group("repeat"));
+    if (null != m.group(OrgParser.TIMESTAMP_REPEAT_GROUP)) {
+      setRepeat(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP));
     }
   }
 
@@ -132,18 +132,18 @@ public class OrgTimestamp {
       }
     }
   }
-  
+
   /**
-   * Return the next repetition of this time, even if 
+   * Return the next repetition of this time, even if
    * it is already in the future. Null if no repeat.
    */
   public LocalDateTime getNextRepetition() {
     if (repeater == null)
       return null;
-    
+
     final LocalDateTime now = LocalDateTime.now();
     LocalDateTime next = date.withDayOfMonth(date.getDayOfMonth());
-    
+
     if (repeater.startsWith("++")) {
       if (now.isAfter(next)) {
         // Just get it into the future
@@ -160,10 +160,10 @@ public class OrgTimestamp {
     } else { // + or
       next = next.plus(repeatPeriod);
     }
-    
+
     return next;
   }
-  
+
   /**
    * Returns null if no repeater is set. Otherwise the next repetition of this
    * time which is in the future. If it is already in the future, it will

@@ -48,16 +48,18 @@ public class OrgTimestampRange {
   public OrgTimestampRange(final Matcher m) {
     this();
 
-    startdate = INDATEFORMAT.parseLocalDateTime(m.group("startdate"));
-    enddate = INDATEFORMAT.parseLocalDateTime(m.group("enddate"));
+    startdate = INDATEFORMAT.parseLocalDateTime(m
+.group(OrgParser.TIMESTAMPRANGE_STARTDATE_GROUP));
+    enddate = INDATEFORMAT.parseLocalDateTime(m.group(OrgParser.TIMESTAMPRANGE_ENDDATE_GROUP));
 
-    if (null != m.group("starttime") && null != m.group("endtime")) {
+    if (null != m.group(OrgParser.TIMESTAMPRANGE_STARTTIME_GROUP)
+        && null != m.group(OrgParser.TIMESTAMPRANGE_ENDTIME_GROUP)) {
       final LocalTime starttime = INTIMEFORMAT.parseLocalTime(m
-          .group("starttime"));
+          .group(OrgParser.TIMESTAMPRANGE_STARTTIME_GROUP));
       startdate = startdate.withTime(starttime.getHourOfDay(),
           starttime.getMinuteOfHour(), 0, 0);
 
-      final LocalTime endtime = INTIMEFORMAT.parseLocalTime(m.group("endtime"));
+      final LocalTime endtime = INTIMEFORMAT.parseLocalTime(m.group(OrgParser.TIMESTAMPRANGE_ENDTIME_GROUP));
       enddate = enddate.withTime(endtime.getHourOfDay(),
           endtime.getMinuteOfHour(), 0, 0);
 

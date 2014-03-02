@@ -42,10 +42,10 @@ public class OrgFile extends OrgNode {
           // Header of node
           // Create new node
           final OrgNode node = new OrgNode();
-          node.setLevel(m.group("stars").length());
-          node.setTitle(m.group("title"));
-          node.setTodo(m.group("todo"));
-          node.addTags(OrgParser.parseTags(m.group("tags")));
+          node.setLevel(m.group(OrgParser.HEADER_STARS_GROUP).length());
+          node.setTitle(m.group(OrgParser.HEADER_TITLE_GROUP));
+          node.setTodo(m.group(OrgParser.HEADER_TODO_GROUP));
+          node.addTags(OrgParser.parseTags(m.group(OrgParser.HEADER_TAGS_GROUP)));
 
           // Find parent
           while (node.getLevel() <= stack.peek().getLevel()) {

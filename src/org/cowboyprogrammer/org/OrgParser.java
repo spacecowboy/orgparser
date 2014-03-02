@@ -6,6 +6,27 @@ import java.util.regex.Pattern;
 
 public class OrgParser {
 
+  public static final String HEADER_STARS_GROUP = "stars";
+  public static final String HEADER_TODO_GROUP = "todo";
+  public static final String HEADER_TITLE_GROUP = "title";
+  public static final String HEADER_TAGS_GROUP = "tags";
+
+  public static final String TIMESTAMP_TYPE_GROUP = "type";
+  public static final String TIMESTAMP_ACTIVE_GROUP = "active";
+  public static final String TIMESTAMP_DATE_GROUP = "date";
+  public static final String TIMESTAMP_DAY_GROUP = "day";
+  public static final String TIMESTAMP_TIME_GROUP = "time";
+  public static final String TIMESTAMP_TIMEEND_GROUP = "timeend";
+  public static final String TIMESTAMP_WARNING_GROUP = "warning";
+  public static final String TIMESTAMP_REPEAT_GROUP = "repeat";
+
+  public static final String TIMESTAMPRANGE_STARTDATE_GROUP = "startdate";
+  public static final String TIMESTAMPRANGE_STARTDAY_GROUP = "startday";
+  public static final String TIMESTAMPRANGE_STARTTIME_GROUP = "starttime";
+  public static final String TIMESTAMPRANGE_ENDDATE_GROUP = "enddate";
+  public static final String TIMESTAMPRANGE_ENDDAY_GROUP = "endday";
+  public static final String TIMESTAMPRANGE_ENDTIME_GROUP = "endtime";
+
   /**
    * Get a regular expression pattern that includes all the possible
    * todo keywords. Matches are placed in named groups:

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class OrgNode {
+
   public static final Pattern timestampPattern = OrgParser
       .getTimestampPattern();
   public static final Pattern timestampRangePattern = OrgParser
@@ -67,7 +68,7 @@ public class OrgNode {
         body = "";
         timestamps.add(new OrgTimestamp(mt));
         return;
-      } 
+      }
       final Matcher mr = timestampRangePattern.matcher(line);
       if (mr.matches()) {
         // Don't keep spaces before timestamps
@@ -85,19 +86,19 @@ public class OrgNode {
    */
   public String getOrgBody() {
     final StringBuilder sb = new StringBuilder();
-    
+
     sb.append(this.comments);
-    
+
     for (OrgTimestamp t : timestamps) {
       sb.append(t.toString()).append("\n");
     }
-    
+
     for (OrgTimestampRange t : timestampRanges) {
       sb.append(t.toString()).append("\n");
     }
 
     sb.append(this.body);
-    
+
     return sb.toString();
   }
 

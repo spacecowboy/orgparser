@@ -88,10 +88,10 @@ public class OrgTests {
     Pattern p = OrgParser.getHeaderPattern();
     Matcher m = p.matcher("* BOB A simple title :bob:alice:");
     assertTrue(m.matches());
-    assertEquals(m.group("stars"), "*");
-    assertEquals(m.group("title"), "BOB A simple title");
-    assertNull(m.group("todo"));
-    assertEquals(m.group("tags"), ":bob:alice:");
+    assertEquals(m.group(OrgParser.HEADER_STARS_GROUP), "*");
+    assertEquals(m.group(OrgParser.HEADER_TITLE_GROUP), "BOB A simple title");
+    assertNull(m.group(OrgParser.HEADER_TODO_GROUP));
+    assertEquals(m.group(OrgParser.HEADER_TAGS_GROUP), ":bob:alice:");
   }
 
   @Test
@@ -99,10 +99,10 @@ public class OrgTests {
     Pattern p = OrgParser.getHeaderPattern("BOB");
     Matcher m = p.matcher("* BOB A simple title :bob:alice:");
     assertTrue(m.matches());
-    assertEquals(m.group("stars"), "*");
-    assertEquals(m.group("title"), "A simple title");
-    assertEquals(m.group("todo"), "BOB");
-    assertEquals(m.group("tags"), ":bob:alice:");
+    assertEquals(m.group(OrgParser.HEADER_STARS_GROUP), "*");
+    assertEquals(m.group(OrgParser.HEADER_TITLE_GROUP), "A simple title");
+    assertEquals(m.group(OrgParser.HEADER_TODO_GROUP), "BOB");
+    assertEquals(m.group(OrgParser.HEADER_TAGS_GROUP), ":bob:alice:");
   }
 
   @Test
@@ -111,24 +111,24 @@ public class OrgTests {
     String s = "<2013-12-31 Tue 12:21>--<2014-02-28 Wed 19:21>";
     Matcher m = p.matcher(s);
     assertTrue(m.matches());
-    assertEquals(m.group("startdate"), "2013-12-31");
-    assertEquals(m.group("startday"), "Tue");
-    assertEquals(m.group("starttime"), "12:21");
-    assertEquals(m.group("enddate"), "2014-02-28");
-    assertEquals(m.group("endday"), "Wed");
-    assertEquals(m.group("endtime"), "19:21");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_STARTDATE_GROUP), "2013-12-31");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_STARTDAY_GROUP), "Tue");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_STARTTIME_GROUP), "12:21");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_ENDDATE_GROUP), "2014-02-28");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_ENDDAY_GROUP), "Wed");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_ENDTIME_GROUP), "19:21");
 
     m = p.matcher("<2013-12-31 12:21>--<2014-02-28 19:21>");
     assertTrue(m.matches());
-    assertEquals(m.group("startdate"), "2013-12-31");
-    assertEquals(m.group("starttime"), "12:21");
-    assertEquals(m.group("enddate"), "2014-02-28");
-    assertEquals(m.group("endtime"), "19:21");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_STARTDATE_GROUP), "2013-12-31");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_STARTTIME_GROUP), "12:21");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_ENDDATE_GROUP), "2014-02-28");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_ENDTIME_GROUP), "19:21");
 
     m = p.matcher("<2013-12-31>--<2014-02-28>");
     assertTrue(m.matches());
-    assertEquals(m.group("startdate"), "2013-12-31");
-    assertEquals(m.group("enddate"), "2014-02-28");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_STARTDATE_GROUP), "2013-12-31");
+    assertEquals(m.group(OrgParser.TIMESTAMPRANGE_ENDDATE_GROUP), "2014-02-28");
   }
 
   @Test
@@ -157,12 +157,12 @@ public class OrgTests {
     Pattern p = OrgParser.getTimestampPattern();
     Matcher m = p.matcher("<2013-12-31 Tue 12:21-14:59 ++1w -2d>");
     assertTrue(m.matches());
-    assertEquals(m.group("date"), "2013-12-31");
-    assertEquals(m.group("day"), "Tue");
-    assertEquals(m.group("time"), "12:21");
-    assertEquals(m.group("timeend"), "14:59");
-    assertEquals(m.group("repeat"), "++1w");
-    assertEquals(m.group("warning"), "-2d");
+    assertEquals(m.group(OrgParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
+    assertEquals(m.group(OrgParser.TIMESTAMP_DAY_GROUP), "Tue");
+    assertEquals(m.group(OrgParser.TIMESTAMP_TIME_GROUP), "12:21");
+    assertEquals(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP), "14:59");
+    assertEquals(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP), "++1w");
+    assertEquals(m.group(OrgParser.TIMESTAMP_WARNING_GROUP), "-2d");
   }
 
   @Test
@@ -170,12 +170,12 @@ public class OrgTests {
     Pattern p = OrgParser.getTimestampPattern();
     Matcher m = p.matcher("SCHEDULED: <2013-12-31 Tue 12:21-14:59 ++1w -2d>");
     assertTrue(m.matches());
-    assertEquals(m.group("date"), "2013-12-31");
-    assertEquals(m.group("day"), "Tue");
-    assertEquals(m.group("time"), "12:21");
-    assertEquals(m.group("timeend"), "14:59");
-    assertEquals(m.group("repeat"), "++1w");
-    assertEquals(m.group("warning"), "-2d");
+    assertEquals(m.group(OrgParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
+    assertEquals(m.group(OrgParser.TIMESTAMP_DAY_GROUP), "Tue");
+    assertEquals(m.group(OrgParser.TIMESTAMP_TIME_GROUP), "12:21");
+    assertEquals(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP), "14:59");
+    assertEquals(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP), "++1w");
+    assertEquals(m.group(OrgParser.TIMESTAMP_WARNING_GROUP), "-2d");
   }
 
   @Test
@@ -183,12 +183,12 @@ public class OrgTests {
     Pattern p = OrgParser.getTimestampPattern();
     Matcher m = p.matcher("<2013-12-31>");
     assertTrue(m.matches());
-    assertEquals(m.group("date"), "2013-12-31");
-    assertNull(m.group("day"));
-    assertNull(m.group("time"));
-    assertNull(m.group("timeend"));
-    assertNull(m.group("repeat"));
-    assertNull(m.group("warning"));
+    assertEquals(m.group(OrgParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
+    assertNull(m.group(OrgParser.TIMESTAMP_DAY_GROUP));
+    assertNull(m.group(OrgParser.TIMESTAMP_TIME_GROUP));
+    assertNull(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP));
+    assertNull(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP));
+    assertNull(m.group(OrgParser.TIMESTAMP_WARNING_GROUP));
   }
 
   @Test
@@ -196,12 +196,12 @@ public class OrgTests {
     Pattern p = OrgParser.getTimestampPattern();
     Matcher m = p.matcher("<2013-12-31 12:30 -1d>");
     assertTrue(m.matches());
-    assertEquals(m.group("date"), "2013-12-31");
-    assertNull(m.group("day"));
-    assertEquals(m.group("time"), "12:30");
-    assertNull(m.group("timeend"));
-    assertNull(m.group("repeat"));
-    assertEquals(m.group("warning"), "-1d");
+    assertEquals(m.group(OrgParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
+    assertNull(m.group(OrgParser.TIMESTAMP_DAY_GROUP));
+    assertEquals(m.group(OrgParser.TIMESTAMP_TIME_GROUP), "12:30");
+    assertNull(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP));
+    assertNull(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP));
+    assertEquals(m.group(OrgParser.TIMESTAMP_WARNING_GROUP), "-1d");
   }
 
   @Test
@@ -209,12 +209,12 @@ public class OrgTests {
     Pattern p = OrgParser.getTimestampPattern();
     Matcher m = p.matcher("  <2013-12-31 12:30 -1d>  ");
     assertTrue(m.matches());
-    assertEquals(m.group("date"), "2013-12-31");
-    assertNull(m.group("day"));
-    assertEquals(m.group("time"), "12:30");
-    assertNull(m.group("timeend"));
-    assertNull(m.group("repeat"));
-    assertEquals(m.group("warning"), "-1d");
+    assertEquals(m.group(OrgParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
+    assertNull(m.group(OrgParser.TIMESTAMP_DAY_GROUP));
+    assertEquals(m.group(OrgParser.TIMESTAMP_TIME_GROUP), "12:30");
+    assertNull(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP));
+    assertNull(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP));
+    assertEquals(m.group(OrgParser.TIMESTAMP_WARNING_GROUP), "-1d");
   }
 
   @Test
@@ -465,10 +465,10 @@ public class OrgTests {
       Matcher m = p.matcher("* NEXT A simple title :bob:alice:");
       while (m.find()) {
         //print(m.group());
-        print("Stars: ", m.group("stars"));
-        print("Title: ", m.group("title"));
-        print("Todo: ", m.group("todo"));
-        print("Tags: ", m.group("tags"));
+        print("Stars: ", m.group(OrgParser.HEADER_STARS_GROUP));
+        print("Title: ", m.group(OrgParser.HEADER_TITLE_GROUP));
+        print("Todo: ", m.group(OrgParser.HEADER_TODO_GROUP));
+        print("Tags: ", m.group(OrgParser.HEADER_TAGS_GROUP));
       }
 
       testfile();
