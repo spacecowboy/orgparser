@@ -59,7 +59,7 @@ public class OrgTests {
 
     try {
 
-      final OrgFile root = OrgFile.createFrom(fname);
+      final OrgFile root = OrgFile.createFromFile(fname);
       print("\n\n");
       print(root.treeToString());
 
