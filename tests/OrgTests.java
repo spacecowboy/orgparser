@@ -9,7 +9,9 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
@@ -73,7 +75,7 @@ public class OrgTests {
         }
       }
 
-      root.writeToFile("test-out.org");
+      writeToFile("test-out.org", root);
 
     } catch (FileNotFoundException e) {
       print(e.getMessage());
@@ -82,6 +84,11 @@ public class OrgTests {
     } catch (ParseException e) {
       print(e.getMessage());
     }
+  }
+  
+  private void writeToFile(String filepath, OrgFile root) throws IOException {
+    BufferedWriter bw = new BufferedWriter(new FileWriter(filepath));
+    root.writeToBuffer(bw);
   }
 
   @Test

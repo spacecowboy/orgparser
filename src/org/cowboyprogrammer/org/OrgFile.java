@@ -2,11 +2,11 @@ package org.cowboyprogrammer.org;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.text.ParseException;
 
 import java.util.Stack;
@@ -15,13 +15,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OrgFile extends OrgNode {
-  
+
   /**
-   * Parse the content of an org-mode file and return a recursive structure of orgnodes.
-   * @throws ParseException 
+   * Read an org file.
+   * 
+   * @param filename
+   *          The filename without the path part
+   * @param br
+   *          A buffered reader of the file contents
+   * @return an OrgFile object containing the file's contents
+   * @throws ParseException
+   * @throws IOException
    */
-  public static OrgFile createFromString(final String filename,
-      final String content) throws ParseException {
+  public static OrgFile createFromBufferedReader(final String filename,
+      final BufferedReader br) throws IOException, ParseException {
     // Need these to handle org parsing
     final Pattern pattern = OrgParser.getHeaderPattern();
     final OrgFile orgfile = new OrgFile(filename);
@@ -29,7 +36,9 @@ public class OrgFile extends OrgNode {
     // Root is file
     stack.push(orgfile);
 
-    for (String line : content.split("\\r?\\n|\\r")) {
+    String line;
+
+    while ((line = br.readLine()) != null) {
       // See what we are reading
       final Matcher m = pattern.matcher(line);
       if (m.matches()) {
@@ -61,33 +70,51 @@ public class OrgFile extends OrgNode {
 
     return orgfile;
   }
-  
+
   /**
-   * Parse a specific org file and return a recursive structure of orgnodes.
-   * @throws IOException 
-   * @throws ParseException 
+   * Read an org file.
+   * 
+   * @param filename
+   *          The filename without the path part
+   * @param content
+   *          The file's contents
+   * @return an OrgFile object containing the file's contents
+   * @throws ParseException
+   * @throws IOException
    */
-  public static OrgFile createFromFile(final File file) throws IOException, ParseException {
-    BufferedReader br = null;
-    StringBuilder sb = new StringBuilder();
-    try {
-      br = new BufferedReader(new FileReader(file));
-      
-      sb.append(br.readLine()).append("\n");
-    } finally {
-      if (br != null)
-        br.close();
-    }
-    
-    return createFromString(file.getPath(), sb.toString());
+  public static OrgFile createFromString(final String filename,
+      final String content) throws ParseException, IOException {
+    return createFromBufferedReader(filename, new BufferedReader(
+        new StringReader(content)));
   }
 
   /**
-   * Parse a specific org file and return a recursive structure of orgnodes.
+   * Read an org file.
+   * 
+   * @param file
+   *          The file open and parse
+   * @return an OrgFile object containing the file's contents
+   * @throws ParseException
+   * @throws IOException
+   */
+  public static OrgFile createFromFile(final File file) throws IOException,
+      ParseException {
+    return createFromBufferedReader(file.getName(), new BufferedReader(
+        new FileReader(file)));
+  }
+
+  /**
+   * Read an org file.
+   * 
+   * @param filepath
+   *          The full path to the file to open and parse.
+   * @return an OrgFile object containing the file's contents
+   * @throws ParseException
+   * @throws IOException
    */
   public static OrgFile createFromFile(final String filepath)
       throws FileNotFoundException, IOException, ParseException {
-    
+
     return createFromFile(new File(filepath));
   }
 
@@ -110,30 +137,29 @@ public class OrgFile extends OrgNode {
       return -1;
   }
 
+  /**
+   * Return the filename without the path part.
+   */
   public String getFilename() {
     return filename;
   }
 
-  public void writeToFile() throws IOException {
-    writeToFile(this.filename);
+  /**
+   * Set the filename without the path part.
+   */
+  public void setFilename(final String filename) {
+    this.filename = filename;
   }
 
-  public void writeToFile(final String filename) throws IOException {
+  /**
+   * Writes the org tree to the writer. Just a convenience method.
+   * @param bw A bufferedwriter to write to
+   * @throws IOException
+   */
+  public void writeToBuffer(final BufferedWriter bw) throws IOException {
+    // Write the org tree
+    bw.write(this.treeToString());
 
-    BufferedWriter bw = null;
-    try {
-      final File file = new File(filename);
-      if (!file.exists())
-        file.createNewFile();
-
-      bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
-      // Write the org tree
-      bw.write(this.treeToString());
-
-    } finally {
-      if (bw != null)
-        bw.close();
-    }
   }
 
   public boolean delete() throws IOException {
