@@ -89,6 +89,40 @@ public class OrgTests {
   private void writeToFile(String filepath, OrgFile root) throws IOException {
     BufferedWriter bw = new BufferedWriter(new FileWriter(filepath));
     root.writeToBuffer(bw);
+    bw.close();
+  }
+  
+  @Test
+  public void testCommentPrefix() {
+    String commentline = "# NONSENSEID= 24SFS2";
+    Matcher mc = OrgParser.getCommentPrefix().matcher(commentline);
+    assertTrue(mc.matches());
+    
+    commentline = "   # NONSENSEID= 24SFS2  ";
+    mc = OrgParser.getCommentPrefix().matcher(commentline);
+    assertTrue(mc.matches());
+    
+    commentline = "# NONSENSEID= 24SFS2  \n";
+    mc = OrgParser.getCommentPrefix().matcher(commentline);
+    assertTrue(mc.matches());
+  }
+  
+  @Test
+  public void testComments() {
+    OrgNode node = new OrgNode();
+    final String commentline = "# NONSENSEID= 24SFS2";
+    final String normalline = "Bob bob";
+    try {
+      node.addBodyLine(commentline + "\n");
+      node.addBodyLine(normalline + "\n");
+      
+      assertEquals(commentline + "\n", node.getComments());
+      assertEquals("\n" + normalline + "\n", node.getBody());
+      
+    } catch (ParseException e) {
+      assertTrue(false);
+    }
+    
   }
 
   @Test

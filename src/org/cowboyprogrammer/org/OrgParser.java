@@ -138,6 +138,10 @@ public class OrgParser {
 
     return Pattern.compile(sb.toString());
   }
+  
+  public static Pattern getCommentPrefix() {
+    return Pattern.compile("^\\s*#.*\\s*$");
+  }
 
 
   /**

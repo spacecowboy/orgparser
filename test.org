@@ -38,3 +38,8 @@ Leading newline on me
 *** two skip one :TTT:
 Goes straight
 /to/ *one*.
+
+* Commented test
+# NONSENSEID: 02DS2G
+
+Bla bla bla

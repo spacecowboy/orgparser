@@ -1,5 +1,6 @@
 package org.cowboyprogrammer.org;
 
+import java.util.Calendar;
 import java.util.regex.Matcher;
 
 import org.joda.time.ReadablePeriod;
@@ -65,6 +66,19 @@ public class OrgTimestamp {
     } else {
       return null;
     }
+  }
+  
+  /**
+   * 
+   * @param millis Milliseconds since the epoch.
+   * @param withTime true if time part is considered valid.
+   */
+  public OrgTimestamp(final long millis, final boolean withTime) {
+    this();
+    final Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(millis);
+    date = LocalDateTime.fromCalendarFields(cal);
+    hasTime = withTime;
   }
 
   /**

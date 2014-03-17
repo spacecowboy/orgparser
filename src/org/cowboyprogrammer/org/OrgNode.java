@@ -12,6 +12,7 @@ public class OrgNode {
       .getTimestampPattern();
   public static final Pattern timestampRangePattern = OrgParser
       .getTimestampRangePattern();
+  public static final Pattern commentPrefix = OrgParser.getCommentPrefix();
   // Parent node of this node
   private OrgNode parent = null;
   // A heading can have any number of sub-headings
@@ -58,23 +59,27 @@ public class OrgNode {
   public void addBodyLine(final String line) throws ParseException {
     // If empty, then we can add timestamps and comments
     if (body.isEmpty() || body.matches("\\A\\s*\\z")) {
+      System.out.println("Emtpy: " + line);
       // Check if comment
-      if (line.startsWith("\\s*#")) {
+      final Matcher mc = commentPrefix.matcher(line);
+      if (mc.matches()) {
+        System.out.println("Starts with #: " + line);
         // It's a comment
         comments += line;
+        body = "\n";
         return;
       }
       final Matcher mt = timestampPattern.matcher(line);
       if (mt.matches()) {
         // Don't keep spaces before timestamps
-        body = "";
+        body = "\n";
         timestamps.add(new OrgTimestamp(mt));
         return;
       }
       final Matcher mr = timestampRangePattern.matcher(line);
       if (mr.matches()) {
         // Don't keep spaces before timestamps
-        body = "";
+        body = "\n";
         timestampRanges.add(new OrgTimestampRange(mr));
         return;
       }
