@@ -56,7 +56,13 @@ public class OrgNode {
    * Add a line to this entry's body. It is parsed and converted to timestamp
    * etc.
    */
-  public void addBodyLine(final String line) throws ParseException {
+  public void addBodyLine(final String oline) throws ParseException {
+    final String line;
+    if (oline.endsWith("\n")) {
+      line = oline;
+    } else {
+      line = oline + "\n";
+    }
     // If empty, then we can add timestamps and comments
     if (body.isEmpty() || body.matches("\\A\\s*\\z")) {
       System.out.println("Emtpy: " + line);
@@ -66,20 +72,20 @@ public class OrgNode {
         System.out.println("Starts with #: " + line);
         // It's a comment
         comments += line;
-        body = "\n";
+        body = "";
         return;
       }
       final Matcher mt = timestampPattern.matcher(line);
       if (mt.matches()) {
         // Don't keep spaces before timestamps
-        body = "\n";
+        body = "";
         timestamps.add(new OrgTimestamp(mt));
         return;
       }
       final Matcher mr = timestampRangePattern.matcher(line);
       if (mr.matches()) {
         // Don't keep spaces before timestamps
-        body = "\n";
+        body = "";
         timestampRanges.add(new OrgTimestampRange(mr));
         return;
       }
@@ -95,6 +101,9 @@ public class OrgNode {
     final StringBuilder sb = new StringBuilder();
 
     sb.append(this.comments);
+    if (this.comments.length() > 0 && !this.comments.endsWith("\n")) {
+      sb.append("\n");
+    }
 
     for (OrgTimestamp t : timestamps) {
       sb.append(t.toString()).append("\n");
@@ -178,6 +187,7 @@ public class OrgNode {
   protected void treeToString(final StringBuilder sb) {
     this.toString(sb);
     for (final OrgNode child : this.subNodes) {
+      sb.append("\n");
       child.treeToString(sb);
     }
   }

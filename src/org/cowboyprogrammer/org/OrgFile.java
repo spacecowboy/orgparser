@@ -64,7 +64,7 @@ public class OrgFile extends OrgNode {
 
       } else {
         // Body of node - OK to place in file
-        stack.peek().addBodyLine(line + "\n");
+        stack.peek().addBodyLine(line);
       }
     }
 

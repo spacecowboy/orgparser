@@ -117,7 +117,7 @@ public class OrgTests {
       node.addBodyLine(normalline + "\n");
       
       assertEquals(commentline + "\n", node.getComments());
-      assertEquals("\n" + normalline + "\n", node.getBody());
+      assertEquals(normalline + "\n", node.getBody());
       
     } catch (ParseException e) {
       assertTrue(false);
