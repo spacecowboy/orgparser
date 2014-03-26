@@ -3,3 +3,6 @@ test-out.org
 orgparser.jar
 *.class
 .gradle
+.idea
+local.properties
+*.iml
