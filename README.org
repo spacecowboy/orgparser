@@ -2,6 +2,17 @@
 
 A Java parser for org-mode files.
 
+** Building the project
+The project builds to a jar file with gradle:
+#+begin_src
+gradle jar
+#+end_src
+
+Run the unit tests with:
+#+begin_src
+gradle test
+#+end_src
+
 ** How the parser works
 
 *** Nodes
