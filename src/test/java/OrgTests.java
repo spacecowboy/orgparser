@@ -85,28 +85,28 @@ public class OrgTests {
       print(e.getMessage());
     }
   }
-  
+
   private void writeToFile(String filepath, OrgFile root) throws IOException {
     BufferedWriter bw = new BufferedWriter(new FileWriter(filepath));
     root.writeToBuffer(bw);
     bw.close();
   }
-  
+
   @Test
   public void testCommentPrefix() {
     String commentline = "# NONSENSEID= 24SFS2";
     Matcher mc = OrgParser.getCommentPrefix().matcher(commentline);
     assertTrue(mc.matches());
-    
+
     commentline = "   # NONSENSEID= 24SFS2  ";
     mc = OrgParser.getCommentPrefix().matcher(commentline);
     assertTrue(mc.matches());
-    
+
     commentline = "# NONSENSEID= 24SFS2  \n";
     mc = OrgParser.getCommentPrefix().matcher(commentline);
     assertTrue(mc.matches());
   }
-  
+
   @Test
   public void testComments() {
     OrgNode node = new OrgNode();
@@ -115,14 +115,14 @@ public class OrgTests {
     try {
       node.addBodyLine(commentline + "\n");
       node.addBodyLine(normalline + "\n");
-      
+
       assertEquals(commentline + "\n", node.getComments());
       assertEquals(normalline + "\n", node.getBody());
-      
+
     } catch (ParseException e) {
       assertTrue(false);
     }
-    
+
   }
 
   @Test
