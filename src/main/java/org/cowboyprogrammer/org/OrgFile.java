@@ -42,6 +42,9 @@ public class OrgFile extends OrgNode {
      */
     public static OrgFile createFromBufferedReader(final String filename,
                                                    final BufferedReader br) throws IOException, ParseException {
+        if (null == filename || br == null) {
+            throw new NullPointerException("Can't read a null buffer");
+        }
         // Need these to handle org parsing
         final Pattern pattern = OrgParser.getHeaderPattern();
         final OrgFile orgfile = new OrgFile(filename);
@@ -51,34 +54,38 @@ public class OrgFile extends OrgNode {
 
         String line;
 
-        while ((line = br.readLine()) != null) {
-            // See what we are reading
-            final Matcher m = pattern.matcher(line);
-            if (m.matches()) {
-                // Header of node
-                // Create new node
-                final OrgNode node = new OrgNode();
-                node.setLevel(m.group(OrgParser.HEADER_STARS_GROUP).length());
-                node.setTitle(m.group(OrgParser.HEADER_TITLE_GROUP));
-                node.setTodo(m.group(OrgParser.HEADER_TODO_GROUP));
-                node.addTags(OrgParser.parseTags(m.group(OrgParser.HEADER_TAGS_GROUP)));
+        try {
+            while ((line = br.readLine()) != null) {
+                // See what we are reading
+                final Matcher m = pattern.matcher(line);
+                if (m.matches()) {
+                    // Header of node
+                    // Create new node
+                    final OrgNode node = new OrgNode();
+                    node.setLevel(m.group(OrgParser.HEADER_STARS_GROUP).length());
+                    node.setTitle(m.group(OrgParser.HEADER_TITLE_GROUP));
+                    node.setTodo(m.group(OrgParser.HEADER_TODO_GROUP));
+                    node.addTags(OrgParser.parseTags(m.group(OrgParser.HEADER_TAGS_GROUP)));
 
-                // Find parent
-                while (node.getLevel() <= stack.peek().getLevel()) {
-                    stack.pop();
+                    // Find parent
+                    while (node.getLevel() <= stack.peek().getLevel()) {
+                        stack.pop();
+                    }
+
+                    // Assign parent
+                    node.setParent(stack.peek());
+                    // Assign child
+                    stack.peek().getSubNodes().add(node);
+                    // Add to stack
+                    stack.push(node);
+
+                } else {
+                    // Body of node - OK to place in file
+                    stack.peek().addBodyLine(line);
                 }
-
-                // Assign parent
-                node.setParent(stack.peek());
-                // Assign child
-                stack.peek().getSubNodes().add(node);
-                // Add to stack
-                stack.push(node);
-
-            } else {
-                // Body of node - OK to place in file
-                stack.peek().addBodyLine(line);
             }
+        } finally {
+            br.close();
         }
 
         return orgfile;
