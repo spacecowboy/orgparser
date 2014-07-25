@@ -117,7 +117,7 @@ public class OrgTests {
 
         try {
             OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
-            assertEquals(orgBody, orgFile1.getSubNodes().get(0).getBody());
+            assertEquals(orgBody + "\n", orgFile1.getSubNodes().get(0).getBody());
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(e.getLocalizedMessage(), false);
@@ -128,9 +128,9 @@ public class OrgTests {
     public void testParsingBodies() {
         // Check if body grows
         final String orgHeader = "* Simple header\n";
-        final String orgBody = "Body of two lines with\nending new line";
-        final String orgEntry = orgHeader + orgBody + "\n" + orgHeader +
-                orgBody + "\n";
+        final String orgBody = "Body of two lines with\nending new lines\n";
+        final String orgEntry = orgHeader + orgBody + orgHeader +
+                orgBody;
 
         try {
             OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
@@ -143,9 +143,25 @@ public class OrgTests {
     }
 
     @Test
+    public void testParagraphs() {
+      // Maintain paragraph formatting
+      final String orgHeader = "* Simple header\n";
+      final String orgBody = "This is a simple paragraph.\n\nA paragraph is separated by atleast two spaces.\n\n\nThis is separated by three and ends with two, with space.\n \n";
+      final String orgEntry = orgHeader + orgBody;
+
+      try {
+        OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
+        assertEquals(orgBody, orgFile1.getSubNodes().get(0).getBody());
+      } catch (Exception e) {
+        e.printStackTrace();
+        assertTrue(e.getLocalizedMessage(), false);
+      }
+    }
+
+    @Test
     public void testRepeatedParsedBodies() {
         // Check if body grows
-        final String orgBody = "Body of two lines with\nno ending newline";
+      final String orgBody = "A simple body\nConsisting of a few paragraphs\n\nThe third of which, is separated by three newlines\n\n\nAnd ends with just one.\n";
         final String orgEntry = "* Simple header\n" + orgBody;
 
         try {
@@ -181,8 +197,8 @@ public class OrgTests {
         final String commentline = "# NONSENSEID= 24SFS2";
         final String normalline = "Bob bob";
         try {
-            node.addBodyLine(commentline + "\n");
-            node.addBodyLine(normalline + "\n");
+            node.addBodyLine(commentline);
+            node.addBodyLine(normalline);
 
             assertEquals(commentline + "\n", node.getComments());
             assertEquals(normalline + "\n", node.getBody());

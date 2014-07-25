@@ -71,19 +71,21 @@ public class OrgNode {
 
     /**
      * Add a line to this entry's body. It is parsed and converted to timestamp
-     * etc.
+     * etc. It is expected to come from BufferedReader's readline and should NOT
+     * have an ending newline character!
      */
     public void addBodyLine(final String line) throws ParseException {
+      if (line.endsWith("\n")) {
+        throw new ParseException("Line should not end with newline!" +
+                                 " See BufferedReader's readline...", 0);
+      }
         // If empty, then we can add timestamps and comments
         if (body.isEmpty() || body.matches("\\A\\s*\\z")) {
             // Check if comment
             final Matcher mc = commentPrefix.matcher(line);
             if (mc.matches()) {
                 // It's a comment
-                if (!comments.isEmpty() && !comments.endsWith("\n")) {
-                    comments += "\n";
-                }
-                comments += line;
+                comments += line + "\n";
                 body = "";
                 return;
             }
@@ -103,10 +105,7 @@ public class OrgNode {
             }
         }
         // Nothing happened above, just add to body
-        if (!body.isEmpty() && !body.endsWith("\n")) {
-            body += "\n";
-        }
-        body += line;
+        body += line + "\n";
     }
 
     /**
@@ -116,7 +115,7 @@ public class OrgNode {
         final StringBuilder sb = new StringBuilder();
 
         sb.append(this.comments);
-        if (this.comments.length() > 0 && !this.comments.endsWith("\n")) {
+        if (this.comments.length() > 0) {
             sb.append("\n");
         }
 
