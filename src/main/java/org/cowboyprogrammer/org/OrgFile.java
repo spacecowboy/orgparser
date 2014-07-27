@@ -52,20 +52,23 @@ public class OrgFile extends OrgNode {
         // Root is file
         stack.push(orgfile);
 
-        String line;
+        String line, sepline = null;
 
         try {
             while ((line = br.readLine()) != null) {
                 // See what we are reading
                 final Matcher m = pattern.matcher(line);
                 if (m.matches()) {
+                    // Destroy separator line
+                    sepline = null;
                     // Header of node
                     // Create new node
                     final OrgNode node = new OrgNode();
                     node.setLevel(m.group(OrgParser.HEADER_STARS_GROUP).length());
                     node.setTitle(m.group(OrgParser.HEADER_TITLE_GROUP));
                     node.setTodo(m.group(OrgParser.HEADER_TODO_GROUP));
-                    node.addTags(OrgParser.parseTags(m.group(OrgParser.HEADER_TAGS_GROUP)));
+                    node.addTags(OrgParser
+                            .parseTags(m.group(OrgParser.HEADER_TAGS_GROUP)));
 
                     // Find parent
                     while (node.getLevel() <= stack.peek().getLevel()) {
@@ -78,9 +81,26 @@ public class OrgFile extends OrgNode {
                     stack.peek().getSubNodes().add(node);
                     // Add to stack
                     stack.push(node);
-
+                    /*
+                    Sep line handles a possible separator line between the
+                    body of the previous item and the header of the next item
+                    . One separator line is allowed,
+                    and will thus get "eaten" during parsing.
+                     */
+                } else if (sepline != null && line.isEmpty()) {
+                    // Another empty line, put last one in node
+                    stack.peek().addBodyLine(sepline);
+                    sepline = line;
+                } else if (sepline == null && line.isEmpty()) {
+                    // Possibly a separator line. Keep track of it.
+                    sepline = line;
                 } else {
                     // Body of node - OK to place in file
+                    // Put sepline there first if not empty
+                    if (sepline != null) {
+                        stack.peek().addBodyLine(sepline);
+                        sepline = null;
+                    }
                     stack.peek().addBodyLine(line);
                 }
             }

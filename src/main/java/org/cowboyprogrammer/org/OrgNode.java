@@ -30,8 +30,6 @@ public class OrgNode {
     public static final Pattern timestampRangePattern = OrgParser
             .getTimestampRangePattern();
     public static final Pattern commentPrefix = OrgParser.getCommentPrefix();
-    // Parent node of this node
-    private OrgNode parent = null;
     // A heading can have any number of sub-headings
     private final List<OrgNode> subNodes;
     // Tags defined on this node
@@ -39,6 +37,8 @@ public class OrgNode {
     // Timestamps associated with entry
     private final List<OrgTimestamp> timestamps;
     private final List<OrgTimestampRange> timestampRanges;
+    // Parent node of this node
+    private OrgNode parent = null;
     // Heading level (number of stars). Must be greater than parent.
     // 0 only valid for file object
     private int level = 0;
@@ -109,15 +109,32 @@ public class OrgNode {
     }
 
     /**
+     * The String representation of this specific entry.
+     */
+    public String toString() {
+        return getOrgHeader() + getOrgBody();
+    }
+
+    /**
+     * Get the header of this entry for org-mode.
+     */
+    public String getOrgHeader() {
+        final StringBuilder sb = new StringBuilder();
+        getHeaderString(sb);
+        // Remove ending newline
+        return sb.toString().trim();
+    }
+
+    /**
      * Get body of this entry for org-mode.
      */
     public String getOrgBody() {
         final StringBuilder sb = new StringBuilder();
 
         sb.append(this.comments);
-        if (this.comments.length() > 0) {
-            sb.append("\n");
-        }
+//        if (this.comments.length() > 0) {
+//            sb.append("\n");
+//        }
 
         for (OrgTimestamp t : timestamps) {
             sb.append(t.toString()).append("\n");
@@ -130,16 +147,6 @@ public class OrgNode {
         sb.append(this.body);
 
         return sb.toString();
-    }
-
-    /**
-     * Get the header of this entry for org-mode.
-     */
-    public String getOrgHeader() {
-        final StringBuilder sb = new StringBuilder();
-        getHeaderString(sb);
-        // Remove ending newline
-        return sb.toString().trim();
     }
 
     /**
@@ -169,11 +176,16 @@ public class OrgNode {
         sb.append("\n");
     }
 
-    /**
-     * The String representation of this specific entry.
-     */
-    public String toString() {
-        return getOrgHeader() + getOrgBody();
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(final int level) {
+        if (level < 0) {
+            throw new IllegalArgumentException(
+                    "Level not allowed to be negative. Only a file can be level 0.");
+        }
+        this.level = level;
     }
 
     /**
@@ -250,18 +262,6 @@ public class OrgNode {
         }
     }
 
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(final int level) {
-        if (level < 0) {
-            throw new IllegalArgumentException(
-                    "Level not allowed to be negative. Only a file can be level 0.");
-        }
-        this.level = level;
-    }
-
     public String getTodo() {
         return todo;
     }
@@ -277,6 +277,10 @@ public class OrgNode {
     public void setTitle(final String title) {
         if (title == null) {
             throw new NullPointerException("Not allowed to be null!");
+        }
+        else if (title.endsWith("\n")) {
+            throw new IllegalArgumentException("Title may not end with " +
+                                               "newline");
         }
         this.title = title;
     }

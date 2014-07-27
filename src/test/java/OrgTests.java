@@ -159,6 +159,29 @@ public class OrgTests {
     }
 
     @Test
+    public void testCommentParagraphGrowth() {
+        OrgNode node = new OrgNode();
+        // Maintain paragraph formatting
+        final String orgHeader = "* Simple header\n";
+        final String orgBody = "This is a simple paragraph.\n\nA paragraph is separated by atleast two spaces.\n\n\nThis is separated by three and ends with two, with space.\n \n";
+        final String commentline = "# NONSENSEID= 24SFS2\n";
+
+        final String orgEntry = orgHeader + commentline + orgBody;
+        try {
+            OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
+            OrgFile orgFile2 = OrgFile.createFromString("test.org", orgFile1.treeToString());
+            OrgFile orgFile3 = OrgFile.createFromString("test.org",
+                    orgFile2.treeToString());
+            assertEquals(orgBody, orgFile3.getSubNodes().get(0).getBody());
+            assertEquals(commentline, orgFile3.getSubNodes().get(0).getComments());
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(e.getLocalizedMessage(), false);
+        }
+
+    }
+
+    @Test
     public void testRepeatedParsedBodies() {
         // Check if body grows
       final String orgBody = "A simple body\nConsisting of a few paragraphs\n\nThe third of which, is separated by three newlines\n\n\nAnd ends with just one.\n";
@@ -170,6 +193,32 @@ public class OrgTests {
             OrgFile orgFile3 = OrgFile.createFromString("test.org",
                     orgFile2.treeToString());
             assertEquals(orgBody, orgFile3.getSubNodes().get(0).getBody());
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(e.getLocalizedMessage(), false);
+        }
+    }
+
+    @Test
+    public void testItemGrowth() {
+        // Check if body grows
+        final String h1 = "* Header one\n";
+        final String b1 = "Body of\nitem one should not\ngrow\n";
+        final String h2 = "* Header two\n";
+        final String b2 = "Body of\nitem two should not\ngrow either\n";
+        final String orgEntry = h1 + b1 + "\n" + h2 + b2;
+
+        try {
+            OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
+            OrgFile orgFile2 = OrgFile.createFromString("test.org", orgFile1.treeToString());
+            OrgFile orgFile3 = OrgFile.createFromString("test.org",
+                    orgFile2.treeToString());
+            assertEquals(h1, orgFile3.getSubNodes().get(0).getOrgHeader() +
+                             "\n");
+            assertEquals(b1, orgFile3.getSubNodes().get(0).getBody());
+            assertEquals(h2, orgFile3.getSubNodes().get(1).getOrgHeader() +
+                             "\n");
+            assertEquals(b2, orgFile3.getSubNodes().get(1).getBody());
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(e.getLocalizedMessage(), false);
