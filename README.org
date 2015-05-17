@@ -1,3 +1,7 @@
+#+begin_html
+<a href='https://bintray.com/spacecowboy/maven/org.cowboyprogrammer%3Aorgparser/_latestVersion'><img src='https://api.bintray.com/packages/spacecowboy/maven/org.cowboyprogrammer%3Aorgparser/images/download.svg'></a>
+#+end_html
+
 * orgparser
 
 A Java parser for org-mode files.
