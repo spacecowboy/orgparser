@@ -1,17 +1,20 @@
 buildscript {
   repositories {
-    mavenCentral()
+    jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:0.9.+'
+      classpath 'com.novoda:bintray-release:0.2.10'
+      //classpath 'com.android.tools.build:gradle:0.9.+'
   }
 }
 
 apply plugin: 'java'
+// must be applied after your artifact generating plugin (eg. java /
+// com.android.library)
+apply plugin: 'bintray-release'
 
 repositories {
-    mavenCentral()
-    mavenLocal()
+    jcenter()
 }
 
 dependencies {
@@ -19,4 +22,16 @@ dependencies {
   compile 'joda-time:joda-time:2.3'
 
   testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+publish {
+    groupId = GROUP
+    artifactId = POM_ARTIFACT_ID
+    publishVersion = VERSION_NAME
+    description = POM_DESCRIPTION
+    website = POM_URL
+    licences = ['LGPL-3.0']
+    uploadName = PROJECT_NAME
+    bintrayUser = BINTRAY_USER
+    bintrayKey = BINTRAY_KEY
 }

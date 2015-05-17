@@ -29,6 +29,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.regex.Matcher;
 
 /**
@@ -269,10 +270,14 @@ public class OrgTimestamp {
         return date;
     }
 
+    public String toString() {
+        return toString(Locale.getDefault());
+    }
+
     /**
      * Returns the string format of this timestamp.
      */
-    public String toString() {
+    public String toString(Locale locale) {
         final StringBuilder sb = new StringBuilder();
         switch (type) {
             case DEADLINE:
@@ -292,13 +297,13 @@ public class OrgTimestamp {
 
         if (hasTime) {
             // With time
-            sb.append(date.toString(OUTDATETIMEFORMAT));
+            sb.append(date.toString(OUTDATETIMEFORMAT, locale));
             if (getEndTime() != null) {
-                sb.append(getEndTime().toString(OUTENDTIMEFORMAT));
+                sb.append(getEndTime().toString(OUTENDTIMEFORMAT, locale));
             }
         } else {
             // Only date
-            sb.append(date.toString(OUTDATEFORMAT));
+            sb.append(date.toString(OUTDATEFORMAT, locale));
         }
 
         // Repeat comes before warning

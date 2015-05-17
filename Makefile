@@ -1,8 +1,15 @@
 test:
-	gradle test
+	./gradlew test
 
 jar:
-	gradle jar
+	./gradlew jar
 
 clean:
-	gradle clean
+	./gradlew clean
+
+release:
+	./gradlew clean build bintrayUpload -PdryRun=false
+
+release-test:
+	./gradlew clean build bintrayUpload
+

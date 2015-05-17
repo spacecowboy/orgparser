@@ -22,6 +22,7 @@ import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 
 /**
@@ -85,17 +86,21 @@ public class OrgTimestampRange {
     }
 
     public String toString() {
+        return toString(Locale.getDefault());
+    }
+
+    public String toString(Locale locale) {
         final StringBuilder sb = new StringBuilder("<");
         if (hasTime) {
-            sb.append(startdate.toString(OUTDATETIMEFORMAT));
+            sb.append(startdate.toString(OUTDATETIMEFORMAT, locale));
         } else {
-            sb.append(startdate.toString(OUTDATEFORMAT));
+            sb.append(startdate.toString(OUTDATEFORMAT, locale));
         }
         sb.append(">--<");
         if (hasTime) {
-            sb.append(enddate.toString(OUTDATETIMEFORMAT));
+            sb.append(enddate.toString(OUTDATETIMEFORMAT, locale));
         } else {
-            sb.append(enddate.toString(OUTDATEFORMAT));
+            sb.append(enddate.toString(OUTDATEFORMAT, locale));
         }
         sb.append(">");
 

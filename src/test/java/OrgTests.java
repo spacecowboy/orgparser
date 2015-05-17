@@ -32,6 +32,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -310,20 +311,20 @@ public class OrgTests {
     public void testTimestampRangeToString() {
         final String sf = "<2013-12-31 Tue 12:21>--<2014-02-28 Fri 19:21>";
         OrgTimestampRange tf = OrgTimestampRange.fromString(sf);
-        assertEquals(sf, tf.toString());
+        assertEquals(sf, tf.toString(Locale.ENGLISH));
 
         final String sd = "<2013-12-31 Tue>--<2014-02-28 Fri>";
         OrgTimestampRange td = OrgTimestampRange.fromString(sd);
-        assertEquals(sd, td.toString());
+        assertEquals(sd, td.toString(Locale.ENGLISH));
 
         // Incomplete ones
         OrgTimestampRange t1 = OrgTimestampRange
                 .fromString("<2013-12-31 Tue>--<2014-02-28 12:29>");
-        assertEquals(sd, t1.toString());
+        assertEquals(sd, t1.toString(Locale.ENGLISH));
 
         OrgTimestampRange t2 = OrgTimestampRange
                 .fromString("<2013-12-31 13:25>--<2014-02-28>");
-        assertEquals(sd, t2.toString());
+        assertEquals(sd, t2.toString(Locale.ENGLISH));
 
     }
 
@@ -399,7 +400,7 @@ public class OrgTests {
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
         OrgTimestamp ts = new OrgTimestamp(m);
-        final String res = ts.toString();
+        final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue>", res);
     }
 
@@ -410,7 +411,7 @@ public class OrgTests {
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
         OrgTimestamp ts = new OrgTimestamp(m);
-        final String res = ts.toString();
+        final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30>", res);
     }
 
@@ -421,7 +422,7 @@ public class OrgTests {
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
         OrgTimestamp ts = new OrgTimestamp(m);
-        final String res = ts.toString();
+        final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 -1w>", res);
     }
 
@@ -432,7 +433,7 @@ public class OrgTests {
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
         OrgTimestamp ts = new OrgTimestamp(m);
-        final String res = ts.toString();
+        final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 ++4y>", res);
     }
 
@@ -443,7 +444,7 @@ public class OrgTests {
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
         OrgTimestamp ts = new OrgTimestamp(m);
-        final String res = ts.toString();
+        final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 ++4m>", res);
     }
 
@@ -454,7 +455,7 @@ public class OrgTests {
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
         OrgTimestamp ts = new OrgTimestamp(m);
-        final String res = ts.toString();
+        final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 ++4w>", res);
     }
 
@@ -465,7 +466,7 @@ public class OrgTests {
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
         OrgTimestamp ts = new OrgTimestamp(m);
-        final String res = ts.toString();
+        final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 ++4d>", res);
     }
 
@@ -476,7 +477,7 @@ public class OrgTests {
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
         OrgTimestamp ts = new OrgTimestamp(m);
-        final String res = ts.toString();
+        final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 ++4h>", res);
     }
 
@@ -487,7 +488,7 @@ public class OrgTests {
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
         OrgTimestamp ts = new OrgTimestamp(m);
-        final String res = ts.toString();
+        final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30-19:12 ++4d>", res);
     }
 
