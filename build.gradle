@@ -30,7 +30,7 @@ publish {
     publishVersion = VERSION_NAME
     description = POM_DESCRIPTION
     website = POM_URL
-    licences = ['LGPL-3.0']
+    licences = ['GPL-3.0']
     uploadName = PROJECT_NAME
     bintrayUser = BINTRAY_USER
     bintrayKey = BINTRAY_KEY
