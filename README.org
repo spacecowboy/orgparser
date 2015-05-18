@@ -6,6 +6,19 @@
 
 A Java parser for org-mode files.
 
+** Include the library in your application
+
+Using gradle, just add this to you build.gradle:
+#+begin_src
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.cowboyprogrammer:orgparser:1.1'
+}
+#+end_src
+
 ** Building the project
 The project builds to a jar file with gradle:
 #+begin_src
