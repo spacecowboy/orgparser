@@ -80,18 +80,18 @@ public class OrgNode {
         if (body.isEmpty() || body.matches("\\A\\s*\\z")) {
             // Check if comment
             if (parser.isCommentLine(line)) {
-                comments += line + "\n";
-                body = "";
+                setComments(getComments() + line + "\n");
+                setBody("");
                 return;
             } else if (parser.isTimestampLine(line)) {
                 // Don't keep spaces before timestamps
                 body = "";
-                timestamps.add(parser.getTimestamp(line));
+                addTimestamp(parser.getTimestamp(line));
                 return;
             } else if (parser.isTimestampRangeLine(line)) {
                 // Don't keep spaces before timestamps
                 body = "";
-                timestampRanges.add(parser.getTimestampRange(line));
+                addTimestampRange(parser.getTimestampRange(line));
                 return;
             }
         }
