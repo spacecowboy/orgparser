@@ -107,6 +107,13 @@ public class OrgNode {
     }
 
     /**
+     * A parser which might have been used to create this object
+     */
+    public OrgParser getParser() {
+        return parser;
+    }
+
+    /**
      * Get the header of this entry for org-mode.
      */
     public String getOrgHeader() {
