@@ -15,13 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cowboyprogrammer.org;
+package org.cowboyprogrammer.org.parser;
+
+import org.cowboyprogrammer.org.OrgNode;
+import org.cowboyprogrammer.org.OrgTimestamp;
+import org.cowboyprogrammer.org.OrgTimestampRange;
 
 import java.security.InvalidParameterException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class OrgParser {
+public class RegexParser implements OrgParser {
 
     /*
      * Can't use named groups because they are not supported in Android.
@@ -46,6 +51,10 @@ public class OrgParser {
     public static final int TIMESTAMPRANGE_ENDDATE_GROUP = 4;
     public static final int TIMESTAMPRANGE_ENDDAY_GROUP = 5;
     public static final int TIMESTAMPRANGE_ENDTIME_GROUP = 6;
+    private final Pattern headerPattern;
+    private final Pattern timestampPattern;
+    private final Pattern timestampRangePattern;
+    private final Pattern commentPattern;
 
     /**
      * Get a regular expression pattern that includes all the possible
@@ -167,10 +176,10 @@ public class OrgParser {
      * <p/>
      * Leading/ending spaces are OK.
      */
-    public static String[] parseTags(final String otags) {
-        if (otags == null) return null;
+    public static String[] parseTags(final String tagString) {
+        if (tagString == null) return null;
 
-        final String tags = otags.trim();
+        final String tags = tagString.trim();
         if (!tags.startsWith(":") || !tags.endsWith(":")) {
             throw new InvalidParameterException("Tag string must" +
                     " start/end with ':'");
@@ -179,4 +188,99 @@ public class OrgParser {
         return tags.substring(1).split(":");
     }
 
+    public RegexParser(final String... todoKeys) {
+        headerPattern = getHeaderPattern(todoKeys);
+        timestampPattern = getTimestampPattern();
+        timestampRangePattern = getTimestampRangePattern();
+        commentPattern = getCommentPrefix();
+    }
+
+    @Override
+    public boolean isHeaderLine(String line) {
+        return headerPattern.matcher(line).matches();
+    }
+
+    /**
+     * @param line to parse
+     * @return OrgNode with parsed values from line. Will have an empty body.
+     */
+    @Override
+    public OrgNode createFromHeader(String line) {
+        final OrgNode node = new OrgNode(this);
+
+        Matcher m = headerPattern.matcher(line);
+
+        if (!m.matches()) {
+            throw new IllegalArgumentException("String is not of proper format!");
+        }
+
+        node.setLevel(m.group(RegexParser.HEADER_STARS_GROUP).length());
+        node.setTitle(m.group(RegexParser.HEADER_TITLE_GROUP));
+        node.setTodo(m.group(RegexParser.HEADER_TODO_GROUP));
+        node.addTags(RegexParser.parseTags(m.group(RegexParser.HEADER_TAGS_GROUP)));
+
+        return node;
+    }
+
+    /**
+     * @param line to parse
+     * @return true if line is a comment, false otherwise
+     */
+    @Override
+    public boolean isCommentLine(String line) {
+        return commentPattern.matcher(line).matches();
+    }
+
+    /**
+     * @param line to parse
+     * @return true if line is a timestamp, false otherwise
+     */
+    @Override
+    public boolean isTimestampLine(String line) {
+        return timestampPattern.matcher(line).matches();
+    }
+
+    /**
+     * @param line to parse
+     * @return true if line is a timestamp range, false otherwise
+     */
+    @Override
+    public boolean isTimestampRangeLine(String line) {
+        return timestampRangePattern.matcher(line).matches();
+    }
+
+    /**
+     * @param line to parse
+     * @return a parsed OrgTimestamp
+     */
+    @Override
+    public OrgTimestamp getTimestamp(String line) {
+        final Matcher m = timestampPattern.matcher(line);
+        if (!m.matches()) {
+            throw new IllegalArgumentException("String is not of proper format!");
+        }
+        return new OrgTimestamp(m.group(RegexParser.TIMESTAMP_ACTIVE_GROUP),
+                m.group(RegexParser.TIMESTAMP_TYPE_GROUP),
+                m.group(RegexParser.TIMESTAMP_DATE_GROUP),
+                m.group(RegexParser.TIMESTAMP_TIME_GROUP),
+                m.group(RegexParser.TIMESTAMP_TIMEEND_GROUP),
+                m.group(RegexParser.TIMESTAMP_WARNING_GROUP),
+                m.group(RegexParser.TIMESTAMP_REPEAT_GROUP));
+    }
+
+    /**
+     * @param line to parse
+     * @return a parsed OrgTimestampRange
+     */
+    @Override
+    public OrgTimestampRange getTimestampRange(String line) {
+        final Matcher m = timestampRangePattern.matcher(line);
+        if (!m.matches()) {
+            throw new IllegalArgumentException("String is not of proper format!");
+        }
+        return new OrgTimestampRange(m.group(RegexParser.TIMESTAMPRANGE_STARTDATE_GROUP),
+                m.group(RegexParser.TIMESTAMPRANGE_ENDDATE_GROUP),
+                m.group(RegexParser.TIMESTAMPRANGE_STARTTIME_GROUP),
+                m.group(RegexParser.TIMESTAMPRANGE_ENDTIME_GROUP));
+    }
 }

@@ -17,37 +17,42 @@
 
 package org.cowboyprogrammer.org;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringReader;
+import org.cowboyprogrammer.org.parser.OrgParser;
+
+import java.io.*;
 import java.text.ParseException;
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class OrgFile extends OrgNode {
+
+    // File where this lives
+    private String filename;
+
+    public OrgFile(final OrgParser orgParser, final String fname) {
+        super(orgParser);
+        filename = fname;
+    }
 
     /**
      * Read an org file.
      *
-     * @param filename The filename without the path part
-     * @param br       A buffered reader of the file contents
+     * @param filename
+     *         The filename without the path part
+     * @param br
+     *         A buffered reader of the file contents
+     *
      * @return an OrgFile object containing the file's contents
+     *
      * @throws ParseException
      * @throws IOException
      */
-    public static OrgFile createFromBufferedReader(final String filename,
+    public static OrgFile createFromBufferedReader(final OrgParser parser, final String filename,
                                                    final BufferedReader br) throws IOException, ParseException {
         if (null == filename || br == null) {
             throw new NullPointerException("Can't read a null buffer");
         }
         // Need these to handle org parsing
-        final Pattern pattern = OrgParser.getHeaderPattern();
-        final OrgFile orgfile = new OrgFile(filename);
+        final OrgFile orgfile = new OrgFile(parser, filename);
         final Stack<OrgNode> stack = new Stack<OrgNode>();
         // Root is file
         stack.push(orgfile);
@@ -57,18 +62,12 @@ public class OrgFile extends OrgNode {
         try {
             while ((line = br.readLine()) != null) {
                 // See what we are reading
-                final Matcher m = pattern.matcher(line);
-                if (m.matches()) {
+                if (parser.isHeaderLine(line)) {
                     // Destroy separator line
                     sepline = null;
                     // Header of node
                     // Create new node
-                    final OrgNode node = new OrgNode();
-                    node.setLevel(m.group(OrgParser.HEADER_STARS_GROUP).length());
-                    node.setTitle(m.group(OrgParser.HEADER_TITLE_GROUP));
-                    node.setTodo(m.group(OrgParser.HEADER_TODO_GROUP));
-                    node.addTags(OrgParser
-                            .parseTags(m.group(OrgParser.HEADER_TAGS_GROUP)));
+                    final OrgNode node = parser.createFromHeader(line);
 
                     // Find parent
                     while (node.getLevel() <= stack.peek().getLevel()) {
@@ -114,63 +113,69 @@ public class OrgFile extends OrgNode {
     /**
      * Read an org file.
      *
-     * @param filename The filename without the path part
-     * @param content  The file's contents
+     * @param parser
+     *         The OrgParser to use
+     * @param filename
+     *         The filename without the path part
+     * @param content
+     *         The file's contents
+     *
      * @return an OrgFile object containing the file's contents
+     *
      * @throws ParseException
      * @throws IOException
      */
-    public static OrgFile createFromString(final String filename,
-                                           final String content) throws ParseException, IOException {
-        return createFromBufferedReader(filename, new BufferedReader(
-                new StringReader(content)));
+    public static OrgFile createFromString(final OrgParser parser, final String filename, final String content)
+            throws ParseException, IOException {
+        return createFromBufferedReader(parser, filename, new BufferedReader(new StringReader(content)));
     }
 
     /**
      * Read an org file.
      *
-     * @param file The file open and parse
+     * @param parser
+     *         The OrgParser to use
+     * @param file
+     *         The file open and parse
+     *
      * @return an OrgFile object containing the file's contents
+     *
      * @throws ParseException
      * @throws IOException
      */
-    public static OrgFile createFromFile(final File file) throws IOException,
-            ParseException {
-        return createFromBufferedReader(file.getName(), new BufferedReader(
-                new FileReader(file)));
+    public static OrgFile createFromFile(final OrgParser parser, final File file) throws IOException, ParseException {
+        return createFromBufferedReader(parser, file.getName(), new BufferedReader(new FileReader(file)));
     }
 
     /**
      * Read an org file.
      *
-     * @param filepath The full path to the file to open and parse.
+     * @param parser
+     *         The OrgParser to use
+     * @param filepath
+     *         The full path to the file to open and parse.
+     *
      * @return an OrgFile object containing the file's contents
+     *
      * @throws ParseException
      * @throws IOException
      */
-    public static OrgFile createFromFile(final String filepath)
+    public static OrgFile createFromFile(final OrgParser parser, final String filepath)
             throws FileNotFoundException, IOException, ParseException {
 
-        return createFromFile(new File(filepath));
-    }
-
-    // File where this lives
-    private String filename;
-
-    public OrgFile(final String fname) {
-        filename = fname;
+        return createFromFile(parser, new File(filepath));
     }
 
     /**
-     * Last modified time of the parsed file. Only valid for existing files,
-     * else -1.
+     * Last modified time of the parsed file. Only valid for existing files, else -1.
      */
     public long lastModified() {
         File f = new File(filename);
-        if (f.exists())
+        if (f.exists()) {
             return f.lastModified();
-        else
+        } else {
             return -1;
+        }
     }
 
     /**
@@ -190,7 +195,9 @@ public class OrgFile extends OrgNode {
     /**
      * Writes the org tree to the writer. Just a convenience method.
      *
-     * @param bw A bufferedwriter to write to
+     * @param bw
+     *         A bufferedwriter to write to
+     *
      * @throws IOException
      */
     public void writeToBuffer(final BufferedWriter bw) throws IOException {

@@ -17,12 +17,13 @@
 
 package org.cowboyprogrammer.org;
 
-import org.junit.Ignore;
+import org.cowboyprogrammer.org.parser.RegexParser;
 import org.junit.Test;
 
-import java.io.*;
-import java.net.URL;
-import java.text.ParseException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 
 
@@ -47,21 +48,21 @@ public class OrgFileTest {
 
     @Test
     public void testfile() throws Exception {
-            final OrgFile root = OrgFile.createFromFile(getFile(TESTFILEPATH));
-            print("\n\n");
-            print(root.treeToString());
+        final OrgFile root = OrgFile.createFromFile(new RegexParser(), getFile(TESTFILEPATH));
+        print("\n\n");
+        print(root.treeToString());
 
-            OrgNode leaf = root;
-            while (leaf != null) {
-                print(leaf.getAllTags());
-                if (leaf.getSubNodes().isEmpty()) {
-                    leaf = null;
-                } else {
-                    leaf = leaf.getSubNodes().get(0);
-                }
+        OrgNode leaf = root;
+        while (leaf != null) {
+            print(leaf.getAllTags());
+            if (leaf.getSubNodes().isEmpty()) {
+                leaf = null;
+            } else {
+                leaf = leaf.getSubNodes().get(0);
             }
+        }
 
-            writeToFile("test-out.org", root);
+        writeToFile("test-out.org", root);
     }
 
     private File getFile(String path) throws Exception {

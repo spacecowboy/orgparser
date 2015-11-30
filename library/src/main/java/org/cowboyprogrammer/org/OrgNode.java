@@ -17,19 +17,14 @@
 
 package org.cowboyprogrammer.org;
 
+import org.cowboyprogrammer.org.parser.OrgParser;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class OrgNode {
 
-    public static final Pattern timestampPattern = OrgParser
-            .getTimestampPattern();
-    public static final Pattern timestampRangePattern = OrgParser
-            .getTimestampRangePattern();
-    public static final Pattern commentPrefix = OrgParser.getCommentPrefix();
     // A heading can have any number of sub-headings
     private final List<OrgNode> subNodes;
     // Tags defined on this node
@@ -37,6 +32,7 @@ public class OrgNode {
     // Timestamps associated with entry
     private final List<OrgTimestamp> timestamps;
     private final List<OrgTimestampRange> timestampRanges;
+    private final OrgParser parser;
     // Parent node of this node
     private OrgNode parent = null;
     // Heading level (number of stars). Must be greater than parent.
@@ -51,7 +47,8 @@ public class OrgNode {
     // Comments before body
     private String comments = "";
 
-    public OrgNode() {
+    public OrgNode(OrgParser parser) {
+        this.parser = parser;
         timestamps = new ArrayList<OrgTimestamp>();
         timestampRanges = new ArrayList<OrgTimestampRange>();
         subNodes = new ArrayList<OrgNode>();
@@ -75,32 +72,26 @@ public class OrgNode {
      * have an ending newline character!
      */
     public void addBodyLine(final String line) throws ParseException {
-      if (line.endsWith("\n")) {
-        throw new ParseException("Line should not end with newline!" +
-                                 " See BufferedReader's readline...", 0);
-      }
+        if (line.endsWith("\n")) {
+            throw new ParseException("Line should not end with newline!" +
+                    " See BufferedReader's readline...", 0);
+        }
         // If empty, then we can add timestamps and comments
         if (body.isEmpty() || body.matches("\\A\\s*\\z")) {
             // Check if comment
-            final Matcher mc = commentPrefix.matcher(line);
-            if (mc.matches()) {
-                // It's a comment
+            if (parser.isCommentLine(line)) {
                 comments += line + "\n";
                 body = "";
                 return;
-            }
-            final Matcher mt = timestampPattern.matcher(line);
-            if (mt.matches()) {
+            } else if (parser.isTimestampLine(line)) {
                 // Don't keep spaces before timestamps
                 body = "";
-                timestamps.add(new OrgTimestamp(mt));
+                timestamps.add(parser.getTimestamp(line));
                 return;
-            }
-            final Matcher mr = timestampRangePattern.matcher(line);
-            if (mr.matches()) {
+            } else if (parser.isTimestampRangeLine(line)) {
                 // Don't keep spaces before timestamps
                 body = "";
-                timestampRanges.add(new OrgTimestampRange(mr));
+                timestampRanges.add(parser.getTimestampRange(line));
                 return;
             }
         }
@@ -277,10 +268,9 @@ public class OrgNode {
     public void setTitle(final String title) {
         if (title == null) {
             throw new NullPointerException("Not allowed to be null!");
-        }
-        else if (title.endsWith("\n")) {
+        } else if (title.endsWith("\n")) {
             throw new IllegalArgumentException("Title may not end with " +
-                                               "newline");
+                    "newline");
         }
         this.title = title;
     }

@@ -15,9 +15,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cowboyprogrammer.org;
+package org.cowboyprogrammer.org.parser;
 
+import org.cowboyprogrammer.org.OrgTimestamp;
 import org.joda.time.LocalDateTime;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Locale;
@@ -30,79 +32,87 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class OrgTimestampTest {
+public class RegexParserOrgTimestampTest {
+
+    private static RegexParser regexParser;
+
+    @BeforeClass
+    public static void setup() {
+        regexParser = new RegexParser();
+    }
+
     @Test
     public void testTimestampPatternFull() {
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher("<2013-12-31 Tue 12:21-14:59 ++1w -2d>");
         assertTrue(m.matches());
-        assertEquals(m.group(OrgParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
-        assertEquals(m.group(OrgParser.TIMESTAMP_DAY_GROUP), "Tue");
-        assertEquals(m.group(OrgParser.TIMESTAMP_TIME_GROUP), "12:21");
-        assertEquals(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP), "14:59");
-        assertEquals(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP), "++1w");
-        assertEquals(m.group(OrgParser.TIMESTAMP_WARNING_GROUP), "-2d");
+        assertEquals(m.group(RegexParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
+        assertEquals(m.group(RegexParser.TIMESTAMP_DAY_GROUP), "Tue");
+        assertEquals(m.group(RegexParser.TIMESTAMP_TIME_GROUP), "12:21");
+        assertEquals(m.group(RegexParser.TIMESTAMP_TIMEEND_GROUP), "14:59");
+        assertEquals(m.group(RegexParser.TIMESTAMP_REPEAT_GROUP), "++1w");
+        assertEquals(m.group(RegexParser.TIMESTAMP_WARNING_GROUP), "-2d");
     }
 
     @Test
     public void testTimestampPatternScheduled() {
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher("SCHEDULED: <2013-12-31 Tue 12:21-14:59 ++1w -2d>");
         assertTrue(m.matches());
-        assertEquals(m.group(OrgParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
-        assertEquals(m.group(OrgParser.TIMESTAMP_DAY_GROUP), "Tue");
-        assertEquals(m.group(OrgParser.TIMESTAMP_TIME_GROUP), "12:21");
-        assertEquals(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP), "14:59");
-        assertEquals(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP), "++1w");
-        assertEquals(m.group(OrgParser.TIMESTAMP_WARNING_GROUP), "-2d");
+        assertEquals(m.group(RegexParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
+        assertEquals(m.group(RegexParser.TIMESTAMP_DAY_GROUP), "Tue");
+        assertEquals(m.group(RegexParser.TIMESTAMP_TIME_GROUP), "12:21");
+        assertEquals(m.group(RegexParser.TIMESTAMP_TIMEEND_GROUP), "14:59");
+        assertEquals(m.group(RegexParser.TIMESTAMP_REPEAT_GROUP), "++1w");
+        assertEquals(m.group(RegexParser.TIMESTAMP_WARNING_GROUP), "-2d");
     }
 
     @Test
     public void testTimestampPatternMinimum() {
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher("<2013-12-31>");
         assertTrue(m.matches());
-        assertEquals(m.group(OrgParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
-        assertNull(m.group(OrgParser.TIMESTAMP_DAY_GROUP));
-        assertNull(m.group(OrgParser.TIMESTAMP_TIME_GROUP));
-        assertNull(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP));
-        assertNull(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP));
-        assertNull(m.group(OrgParser.TIMESTAMP_WARNING_GROUP));
+        assertEquals(m.group(RegexParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
+        assertNull(m.group(RegexParser.TIMESTAMP_DAY_GROUP));
+        assertNull(m.group(RegexParser.TIMESTAMP_TIME_GROUP));
+        assertNull(m.group(RegexParser.TIMESTAMP_TIMEEND_GROUP));
+        assertNull(m.group(RegexParser.TIMESTAMP_REPEAT_GROUP));
+        assertNull(m.group(RegexParser.TIMESTAMP_WARNING_GROUP));
     }
 
     @Test
     public void testTimestampPatternParts() {
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher("<2013-12-31 12:30 -1d>");
         assertTrue(m.matches());
-        assertEquals(m.group(OrgParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
-        assertNull(m.group(OrgParser.TIMESTAMP_DAY_GROUP));
-        assertEquals(m.group(OrgParser.TIMESTAMP_TIME_GROUP), "12:30");
-        assertNull(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP));
-        assertNull(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP));
-        assertEquals(m.group(OrgParser.TIMESTAMP_WARNING_GROUP), "-1d");
+        assertEquals(m.group(RegexParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
+        assertNull(m.group(RegexParser.TIMESTAMP_DAY_GROUP));
+        assertEquals(m.group(RegexParser.TIMESTAMP_TIME_GROUP), "12:30");
+        assertNull(m.group(RegexParser.TIMESTAMP_TIMEEND_GROUP));
+        assertNull(m.group(RegexParser.TIMESTAMP_REPEAT_GROUP));
+        assertEquals(m.group(RegexParser.TIMESTAMP_WARNING_GROUP), "-1d");
     }
 
     @Test
     public void testTimestampPatternSpaces() {
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher("  <2013-12-31 12:30 -1d>  ");
         assertTrue(m.matches());
-        assertEquals(m.group(OrgParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
-        assertNull(m.group(OrgParser.TIMESTAMP_DAY_GROUP));
-        assertEquals(m.group(OrgParser.TIMESTAMP_TIME_GROUP), "12:30");
-        assertNull(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP));
-        assertNull(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP));
-        assertEquals(m.group(OrgParser.TIMESTAMP_WARNING_GROUP), "-1d");
+        assertEquals(m.group(RegexParser.TIMESTAMP_DATE_GROUP), "2013-12-31");
+        assertNull(m.group(RegexParser.TIMESTAMP_DAY_GROUP));
+        assertEquals(m.group(RegexParser.TIMESTAMP_TIME_GROUP), "12:30");
+        assertNull(m.group(RegexParser.TIMESTAMP_TIMEEND_GROUP));
+        assertNull(m.group(RegexParser.TIMESTAMP_REPEAT_GROUP));
+        assertEquals(m.group(RegexParser.TIMESTAMP_WARNING_GROUP), "-1d");
     }
 
     @Test
     public void testTimestampToString1() throws Exception {
         final String s = "<2013-12-31>";
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
-        OrgTimestamp ts = new OrgTimestamp(m);
+        OrgTimestamp ts = regexParser.getTimestamp(s);
         final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue>", res);
     }
@@ -110,10 +120,10 @@ public class OrgTimestampTest {
     @Test
     public void testTimestampToString2() throws Exception {
         final String s = "<2013-12-31 12:30>";
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
-        OrgTimestamp ts = new OrgTimestamp(m);
+        OrgTimestamp ts = regexParser.getTimestamp(s);
         final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30>", res);
     }
@@ -121,10 +131,10 @@ public class OrgTimestampTest {
     @Test
     public void testTimestampToString3() throws Exception {
         final String s = "<2013-12-31 12:30 -1w>";
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
-        OrgTimestamp ts = new OrgTimestamp(m);
+        OrgTimestamp ts = regexParser.getTimestamp(s);
         final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 -1w>", res);
     }
@@ -132,10 +142,10 @@ public class OrgTimestampTest {
     @Test
     public void testTimestampToString4() throws Exception {
         final String s = "<2013-12-31 12:30 ++4y>";
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
-        OrgTimestamp ts = new OrgTimestamp(m);
+        OrgTimestamp ts = regexParser.getTimestamp(s);
         final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 ++4y>", res);
     }
@@ -143,10 +153,10 @@ public class OrgTimestampTest {
     @Test
     public void testTimestampPattern4a() throws Exception {
         final String s = "<2013-12-31 12:30 ++4m>";
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
-        OrgTimestamp ts = new OrgTimestamp(m);
+        OrgTimestamp ts = regexParser.getTimestamp(s);
         final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 ++4m>", res);
     }
@@ -154,10 +164,10 @@ public class OrgTimestampTest {
     @Test
     public void testTimestampPattern4b() throws Exception {
         final String s = "<2013-12-31 12:30 ++4w>";
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
-        OrgTimestamp ts = new OrgTimestamp(m);
+        OrgTimestamp ts = regexParser.getTimestamp(s);
         final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 ++4w>", res);
     }
@@ -165,10 +175,10 @@ public class OrgTimestampTest {
     @Test
     public void testTimestampPattern4c() throws Exception {
         final String s = "<2013-12-31 12:30 ++4d>";
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
-        OrgTimestamp ts = new OrgTimestamp(m);
+        OrgTimestamp ts = regexParser.getTimestamp(s);
         final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 ++4d>", res);
     }
@@ -176,10 +186,10 @@ public class OrgTimestampTest {
     @Test
     public void testTimestampPattern4d() throws Exception {
         final String s = "<2013-12-31 12:30 ++4h>";
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
-        OrgTimestamp ts = new OrgTimestamp(m);
+        OrgTimestamp ts = regexParser.getTimestamp(s);
         final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30 ++4h>", res);
     }
@@ -187,10 +197,10 @@ public class OrgTimestampTest {
     @Test
     public void testTimestampToString5Dur() throws Exception {
         final String s = "<2013-12-31 12:30-19:12 ++4d>";
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
-        OrgTimestamp ts = new OrgTimestamp(m);
+        OrgTimestamp ts = regexParser.getTimestamp(s);
         final String res = ts.toString(Locale.ENGLISH);
         assertEquals("<2013-12-31 Tue 12:30-19:12 ++4d>", res);
     }
@@ -198,10 +208,10 @@ public class OrgTimestampTest {
     @Test
     public void testTimestampGetWarning() throws Exception {
         final String s = "<2013-12-31 12:30-19:12 -1d>";
-        Pattern p = OrgParser.getTimestampPattern();
+        Pattern p = RegexParser.getTimestampPattern();
         Matcher m = p.matcher(s);
         assertTrue(m.matches());
-        OrgTimestamp ts = new OrgTimestamp(m);
+        OrgTimestamp ts = regexParser.getTimestamp(s);
 
         assertEquals(12, ts.getWarningTime().getMonthOfYear());
         assertEquals(30, ts.getWarningTime().getDayOfMonth());
@@ -213,7 +223,7 @@ public class OrgTimestampTest {
     @Test
     public void testTimestampNextRepeatSimple() throws Exception {
         // year
-        OrgTimestamp ts = OrgTimestamp.fromString("<2013-12-31 12:30 +1y>");
+        OrgTimestamp ts = regexParser.getTimestamp("<2013-12-31 12:30 +1y>");
         assertEquals(2013, ts.getDate().getYear());
         ts.toNextRepeat();
         assertEquals(2014, ts.getDate().getYear());
@@ -247,23 +257,23 @@ public class OrgTimestampTest {
     public void testTimestampNextRepeatFutureToday() throws Exception {
         // year in the past
         OrgTimestamp ts;
-        ts = OrgTimestamp.fromString("<2001-12-28 12:30 .+1y>");
+        ts = regexParser.getTimestamp("<2001-12-28 12:30 .+1y>");
         final LocalDateTime now = LocalDateTime.now();
         assertEquals(2001, ts.getDate().getYear());
         ts.toNextRepeat();
         assertTrue(now.getYear() <= ts.getDate().getYear());
 
-        ts = OrgTimestamp.fromString("<2001-12-28 12:30 .+1y>");
+        ts = regexParser.getTimestamp("<2001-12-28 12:30 .+1y>");
         ts.setRepeat(".+1m");
         ts.toNextRepeat();
         assertTrue(now.getMonthOfYear() <= ts.getDate().getMonthOfYear());
 
-        ts = OrgTimestamp.fromString("<2001-12-28 12:30 .+1y>");
+        ts = regexParser.getTimestamp("<2001-12-28 12:30 .+1y>");
         ts.setRepeat(".+1w");
         ts.toNextRepeat();
         assertTrue(now.getDayOfYear() <= ts.getDate().getDayOfYear());
 
-        ts = OrgTimestamp.fromString("<2001-12-28 12:30 .+1y>");
+        ts = regexParser.getTimestamp("<2001-12-28 12:30 .+1y>");
         ts.setRepeat(".+1d");
         ts.toNextRepeat();
         if (now.getMonthOfYear() == ts.getDate().getMonthOfYear()) {
@@ -272,7 +282,7 @@ public class OrgTimestampTest {
             assertTrue(now.getDayOfMonth() > ts.getDate().getDayOfMonth());
         }
 
-        ts = OrgTimestamp.fromString("<2001-12-28 12:30 .+1y>");
+        ts = regexParser.getTimestamp("<2001-12-28 12:30 .+1y>");
         ts.setRepeat(".+1h");
         ts.toNextRepeat();
         if (now.getDayOfYear() == ts.getDate().getDayOfYear())
@@ -285,7 +295,7 @@ public class OrgTimestampTest {
     public void testTimestampNextRepeatFuture() throws Exception {
         // year in the past
         OrgTimestamp ts;
-        ts = OrgTimestamp.fromString("<2001-12-28 12:30 ++1y>");
+        ts = regexParser.getTimestamp("<2001-12-28 12:30 ++1y>");
         assertNotNull(ts);
         final LocalDateTime now = LocalDateTime.now();
         assertEquals(2001, ts.getDate().getYear());
@@ -296,7 +306,7 @@ public class OrgTimestampTest {
         assertEquals(12, ts.getDate().getHourOfDay());
         assertEquals(30, ts.getDate().getMinuteOfHour());
 
-        ts = OrgTimestamp.fromString("<2001-12-28 12:30 ++1m>");
+        ts = regexParser.getTimestamp("<2001-12-28 12:30 ++1m>");
         assertNotNull(ts);
         ts.toNextRepeat();
         assertTrue(ts.getDate().isAfter(now));
@@ -304,7 +314,7 @@ public class OrgTimestampTest {
         assertEquals(12, ts.getDate().getHourOfDay());
         assertEquals(30, ts.getDate().getMinuteOfHour());
 
-        ts = OrgTimestamp.fromString("<2001-12-28 12:30 ++1w>");
+        ts = regexParser.getTimestamp("<2001-12-28 12:30 ++1w>");
         assertNotNull(ts);
         int day = ts.getDate().getDayOfWeek();
         ts.toNextRepeat();
@@ -313,14 +323,14 @@ public class OrgTimestampTest {
         assertEquals(12, ts.getDate().getHourOfDay());
         assertEquals(30, ts.getDate().getMinuteOfHour());
 
-        ts = OrgTimestamp.fromString("<2001-12-28 12:30 ++1d>");
+        ts = regexParser.getTimestamp("<2001-12-28 12:30 ++1d>");
         assertNotNull(ts);
         ts.toNextRepeat();
         assertTrue(ts.getDate().isAfter(now));
         assertEquals(12, ts.getDate().getHourOfDay());
         assertEquals(30, ts.getDate().getMinuteOfHour());
 
-        ts = OrgTimestamp.fromString("<2001-12-28 12:30 ++1h>");
+        ts = regexParser.getTimestamp("<2001-12-28 12:30 ++1h>");
         assertNotNull(ts);
         ts.toNextRepeat();
         assertTrue(ts.getDate().isAfter(now));

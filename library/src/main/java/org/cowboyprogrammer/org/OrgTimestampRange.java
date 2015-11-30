@@ -23,7 +23,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
-import java.util.regex.Matcher;
 
 /**
  * This class represents a duration.
@@ -44,42 +43,21 @@ public class OrgTimestampRange {
 
     private boolean hasTime = false;
 
-    /**
-     * Parse an org-timestamp
-     */
-    public static OrgTimestampRange fromString(final String s) {
-        final Matcher m = OrgParser.getTimestampRangePattern().matcher(s);
-        if (m.matches()) {
-            return new OrgTimestampRange(m);
-        } else {
-            return null;
-        }
-    }
-
     public OrgTimestampRange() {
     }
 
-    /**
-     * Matcher is expected to have the same groups as the pattern from
-     * OrgParser will give.
-     */
-    public OrgTimestampRange(final Matcher m) {
+    public OrgTimestampRange(final String startDate, final String endDate, final String startTime,
+                             final String endTime) {
         this();
+        startdate = INDATEFORMAT.parseLocalDateTime(startDate);
+        enddate = INDATEFORMAT.parseLocalDateTime(endDate);
 
-        startdate = INDATEFORMAT.parseLocalDateTime(m
-                .group(OrgParser.TIMESTAMPRANGE_STARTDATE_GROUP));
-        enddate = INDATEFORMAT.parseLocalDateTime(m.group(OrgParser.TIMESTAMPRANGE_ENDDATE_GROUP));
+        if (null != startTime && null != endTime) {
+            final LocalTime starttime = INTIMEFORMAT.parseLocalTime(startTime);
+            startdate = startdate.withTime(starttime.getHourOfDay(), starttime.getMinuteOfHour(), 0, 0);
 
-        if (null != m.group(OrgParser.TIMESTAMPRANGE_STARTTIME_GROUP)
-                && null != m.group(OrgParser.TIMESTAMPRANGE_ENDTIME_GROUP)) {
-            final LocalTime starttime = INTIMEFORMAT.parseLocalTime(m
-                    .group(OrgParser.TIMESTAMPRANGE_STARTTIME_GROUP));
-            startdate = startdate.withTime(starttime.getHourOfDay(),
-                    starttime.getMinuteOfHour(), 0, 0);
-
-            final LocalTime endtime = INTIMEFORMAT.parseLocalTime(m.group(OrgParser.TIMESTAMPRANGE_ENDTIME_GROUP));
-            enddate = enddate.withTime(endtime.getHourOfDay(),
-                    endtime.getMinuteOfHour(), 0, 0);
+            final LocalTime endtime = INTIMEFORMAT.parseLocalTime(endTime);
+            enddate = enddate.withTime(endtime.getHourOfDay(), endtime.getMinuteOfHour(), 0, 0);
 
             hasTime = true;
         }

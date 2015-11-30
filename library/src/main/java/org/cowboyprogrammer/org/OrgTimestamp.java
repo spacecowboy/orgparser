@@ -17,20 +17,12 @@
 
 package org.cowboyprogrammer.org;
 
-import org.joda.time.Days;
-import org.joda.time.Hours;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.Months;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
+import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.regex.Matcher;
 
 /**
  * This class represents a single timestamp. Not a duration.
@@ -75,18 +67,6 @@ public class OrgTimestamp {
     }
 
     /**
-     * Parse an org-timestamp
-     */
-    public static OrgTimestamp fromString(final String s) {
-        final Matcher m = OrgParser.getTimestampPattern().matcher(s);
-        if (m.matches()) {
-            return new OrgTimestamp(m);
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * @param millis   Milliseconds since the epoch.
      * @param withTime true if time part is considered valid.
      */
@@ -98,44 +78,41 @@ public class OrgTimestamp {
         hasTime = withTime;
     }
 
-    /**
-     * Matcher is expected to have the same groups as the pattern from
-     * OrgParser will give.
-     */
-    public OrgTimestamp(final Matcher m) {
+    public OrgTimestamp(final String active, final String type, final String date,
+                        final String time, final String timeEnd, final String warning,
+                        final String repeat) {
         this();
+        this.date = INDATEFORMAT.parseLocalDateTime(date);
 
-        date = INDATEFORMAT.parseLocalDateTime(m.group(OrgParser.TIMESTAMP_DATE_GROUP));
-
-        if ("[".equals(m.group(OrgParser.TIMESTAMP_ACTIVE_GROUP))) {
+        if ("[".equals(active)) {
             inactive = true;
         }
 
-        if (null != m.group(OrgParser.TIMESTAMP_TYPE_GROUP)) {
-            final String t = m.group(OrgParser.TIMESTAMP_TYPE_GROUP);
+        if (null != type) {
+            final String t = type;
             if (t.equals("DEADLINE")) {
-                type = Type.DEADLINE;
+                this.type = Type.DEADLINE;
             } else if (t.equals("SCHEDULED")) {
-                type = Type.SCHEDULED;
+                this.type = Type.SCHEDULED;
             }
         }
 
-        if (null != m.group(OrgParser.TIMESTAMP_TIME_GROUP)) {
-            final LocalTime time = INTIMEFORMAT.parseLocalTime(m.group(OrgParser.TIMESTAMP_TIME_GROUP));
-            date = date.withTime(time.getHourOfDay(), time.getMinuteOfHour(), 0, 0);
+        if (null != time) {
+            final LocalTime t = INTIMEFORMAT.parseLocalTime(time);
+            this.date = this.date.withTime(t.getHourOfDay(), t.getMinuteOfHour(), 0, 0);
             hasTime = true;
 
-            if (null != m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP)) {
-                setEndTime(INTIMEFORMAT.parseLocalTime(m.group(OrgParser.TIMESTAMP_TIMEEND_GROUP)));
+            if (null != timeEnd) {
+                setEndTime(INTIMEFORMAT.parseLocalTime(timeEnd));
             }
         }
 
-        if (null != m.group(OrgParser.TIMESTAMP_WARNING_GROUP)) {
-            setWarning(m.group(OrgParser.TIMESTAMP_WARNING_GROUP));
+        if (null != warning) {
+            setWarning(warning);
         }
 
-        if (null != m.group(OrgParser.TIMESTAMP_REPEAT_GROUP)) {
-            setRepeat(m.group(OrgParser.TIMESTAMP_REPEAT_GROUP));
+        if (null != repeat) {
+            setRepeat(repeat);
         }
     }
 
