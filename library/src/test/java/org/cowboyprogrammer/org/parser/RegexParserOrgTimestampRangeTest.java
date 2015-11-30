@@ -18,7 +18,6 @@
 package org.cowboyprogrammer.org.parser;
 
 import org.cowboyprogrammer.org.OrgTimestampRange;
-import org.cowboyprogrammer.org.parser.RegexParser;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -28,7 +27,6 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 
 public class RegexParserOrgTimestampRangeTest {
@@ -82,6 +80,5 @@ public class RegexParserOrgTimestampRangeTest {
 
         OrgTimestampRange t2 = regexParser.getTimestampRange("<2013-12-31 13:25>--<2014-02-28>");
         assertEquals(sd, t2.toString(Locale.ENGLISH));
-
     }
 }

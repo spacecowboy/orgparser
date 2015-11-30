@@ -25,6 +25,8 @@ import java.security.InvalidParameterException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.cowboyprogrammer.org.util.StringUtils.reverse;
+
 
 public class RegexParser implements OrgParser {
 
@@ -33,8 +35,10 @@ public class RegexParser implements OrgParser {
      */
     public static final int HEADER_STARS_GROUP = 1;
     public static final int HEADER_TODO_GROUP = 2;
-    public static final int HEADER_TITLE_GROUP = 3;
-    public static final int HEADER_TAGS_GROUP = 4;
+    public static final int HEADER_REST_GROUP = 3;
+
+    public static final int HEADER_REST_TAGS_GROUP = 1;
+    public static final int HEADER_REST_TITLE_GROUP = 2;
 
     public static final int TIMESTAMP_TYPE_GROUP = 1;
     public static final int TIMESTAMP_ACTIVE_GROUP = 2;
@@ -55,11 +59,12 @@ public class RegexParser implements OrgParser {
     private final Pattern timestampPattern;
     private final Pattern timestampRangePattern;
     private final Pattern commentPattern;
+    private final Pattern headerRestPattern;
 
     /**
      * Get a regular expression pattern that includes all the possible
-     * todo keywords. Matches are placed in named groups:
-     * stars, todo, title, tags
+     * todo keywords. Only the leading star and todo keyword is placed in groups.
+     * The rest have to be processed by getHeaderRestPattern
      */
     public static Pattern getHeaderPattern(final String... todoKeys) {
         final StringBuilder sb = new StringBuilder();
@@ -72,9 +77,24 @@ public class RegexParser implements OrgParser {
         }
         sb.append("))?");
         //sb.append("(?<prio>\\s+\\[#[A-C]\\])?"); // Optional priority
-        sb.append("\\s+(.+?)"); // Title
-        sb.append("(?:\\s+(:.+:))?"); // Optional Tags
-        sb.append("\\s*$"); // End of line
+        sb.append("(?:\\s(.*))?"); // Rest (title and tags)
+        sb.append("$"); // End of line
+        return Pattern.compile(sb.toString());
+    }
+
+    /**
+     * Parses the rest of the string in the header, which will be optional title and optional tags.
+     * Note, this returns a REVERSED pattern. You have to reverse your string before to match correctly.
+     * I.e., "Title :tag:tag:" --> ":gat:gat: eltiT"
+     *
+     * Once you've matched, reverse the groups again.
+     */
+    public static Pattern getHeaderRestPattern() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("^"); // start of reversed line
+        sb.append("\\s*(?:(:.+:))?"); // optional tags
+        sb.append("(?:\\s?(.*))?");// optional title
+        sb.append("$"); // End of reversed lineline
         return Pattern.compile(sb.toString());
     }
 
@@ -190,6 +210,7 @@ public class RegexParser implements OrgParser {
 
     public RegexParser(final String... todoKeys) {
         headerPattern = getHeaderPattern(todoKeys);
+        headerRestPattern = getHeaderRestPattern();
         timestampPattern = getTimestampPattern();
         timestampRangePattern = getTimestampRangePattern();
         commentPattern = getCommentPrefix();
@@ -214,11 +235,18 @@ public class RegexParser implements OrgParser {
             throw new IllegalArgumentException("String is not of proper format!");
         }
 
-        node.setLevel(m.group(RegexParser.HEADER_STARS_GROUP).length());
-        node.setTitle(m.group(RegexParser.HEADER_TITLE_GROUP));
-        node.setTodo(m.group(RegexParser.HEADER_TODO_GROUP));
-        node.addTags(RegexParser.parseTags(m.group(RegexParser.HEADER_TAGS_GROUP)));
+        node.setLevel(m.group(HEADER_STARS_GROUP).length());
+        node.setTodo(m.group(HEADER_TODO_GROUP));
 
+        String rest = m.group(HEADER_REST_GROUP);
+        if (rest != null && !rest.isEmpty()) {
+            m = headerRestPattern.matcher(reverse(rest));
+
+            if (m.matches()) {
+                node.setTitle(reverse(m.group(HEADER_REST_TITLE_GROUP)));
+                node.addTags(parseTags(reverse(m.group(HEADER_REST_TAGS_GROUP))));
+            }
+        }
         return node;
     }
 

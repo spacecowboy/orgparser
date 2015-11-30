@@ -62,15 +62,15 @@ public class OrgFileTest {
             }
         }
 
-        writeToFile("test-out.org", root);
+        writeToFile(File.createTempFile("test-out", ".org"), root);
     }
 
     private File getFile(String path) throws Exception {
         return new File(getClass().getClassLoader().getResource(path).getFile());
     }
 
-    private void writeToFile(String filepath, OrgFile root) throws IOException {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(filepath));
+    private void writeToFile(File file, OrgFile root) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
         root.writeToBuffer(bw);
         bw.close();
     }
