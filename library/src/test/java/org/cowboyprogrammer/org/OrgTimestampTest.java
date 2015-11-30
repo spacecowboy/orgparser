@@ -1,37 +1,25 @@
 /*
- * Copyright (c) Jonas Kalderstam 2014.
+ * Copyright (c) 2015 Jonas Kalderstam
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.cowboyprogrammer.org.OrgFile;
-import org.cowboyprogrammer.org.OrgNode;
-import org.cowboyprogrammer.org.OrgParser;
-import org.cowboyprogrammer.org.OrgTimestamp;
-import org.cowboyprogrammer.org.OrgTimestampRange;
-import org.joda.time.LocalDateTime;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+package org.cowboyprogrammer.org;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Collection;
+import org.joda.time.LocalDateTime;
+import org.junit.Test;
+
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,248 +29,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(JUnit4.class)
-public class OrgTests {
 
-    @Test
-    public void thisAlwaysPasses() {
-
-    }
-
-    static void print(final int... numbers) {
-        for (final int n : numbers) {
-            System.out.println(n);
-            System.out.print(" ");
-        }
-    }
-
-    static void print(final Collection<String> strings) {
-        for (final String s : strings) {
-            System.out.print(s);
-            System.out.print(" ");
-        }
-        System.out.println("");
-    }
-
-    static void print(final String... strings) {
-        for (final String s : strings) {
-            System.out.print(s);
-            System.out.print(" ");
-        }
-        System.out.println("");
-    }
-
-    @Test
-    @Ignore
-    public void testfile() {
-        final String fname = "test.org";
-
-        try {
-
-            final OrgFile root = OrgFile.createFromFile(fname);
-            print("\n\n");
-            print(root.treeToString());
-
-            OrgNode leaf = root;
-            while (leaf != null) {
-                print(leaf.getAllTags());
-                if (leaf.getSubNodes().isEmpty()) {
-                    leaf = null;
-                } else {
-                    leaf = leaf.getSubNodes().get(0);
-                }
-            }
-
-            writeToFile("test-out.org", root);
-
-        } catch (FileNotFoundException e) {
-            print(e.getMessage());
-        } catch (IOException e) {
-            print(e.getMessage());
-        } catch (ParseException e) {
-            print(e.getMessage());
-        }
-    }
-
-    private void writeToFile(String filepath, OrgFile root) throws IOException {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(filepath));
-        root.writeToBuffer(bw);
-        bw.close();
-    }
-
-    @Test
-    public void testParsingBody() {
-        // Check if body grows
-        final String orgBody = "Body of two lines with\nno ending newline";
-        final String orgEntry = "* Simple header\n" + orgBody;
-
-        try {
-            OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
-            assertEquals(orgBody + "\n", orgFile1.getSubNodes().get(0).getBody());
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(e.getLocalizedMessage(), false);
-        }
-    }
-
-    @Test
-    public void testParsingBodies() {
-        // Check if body grows
-        final String orgHeader = "* Simple header\n";
-        final String orgBody = "Body of two lines with\nending new lines\n";
-        final String orgEntry = orgHeader + orgBody + orgHeader +
-                orgBody;
-
-        try {
-            OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
-            assertEquals(orgBody, orgFile1.getSubNodes().get(0).getBody());
-            assertEquals(orgBody, orgFile1.getSubNodes().get(1).getBody());
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(e.getLocalizedMessage(), false);
-        }
-    }
-
-    @Test
-    public void testParagraphs() {
-      // Maintain paragraph formatting
-      final String orgHeader = "* Simple header\n";
-      final String orgBody = "This is a simple paragraph.\n\nA paragraph is separated by atleast two spaces.\n\n\nThis is separated by three and ends with two, with space.\n \n";
-      final String orgEntry = orgHeader + orgBody;
-
-      try {
-        OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
-        assertEquals(orgBody, orgFile1.getSubNodes().get(0).getBody());
-      } catch (Exception e) {
-        e.printStackTrace();
-        assertTrue(e.getLocalizedMessage(), false);
-      }
-    }
-
-    @Test
-    public void testCommentParagraphGrowth() {
-        OrgNode node = new OrgNode();
-        // Maintain paragraph formatting
-        final String orgHeader = "* Simple header\n";
-        final String orgBody = "This is a simple paragraph.\n\nA paragraph is separated by atleast two spaces.\n\n\nThis is separated by three and ends with two, with space.\n \n";
-        final String commentline = "# NONSENSEID= 24SFS2\n";
-
-        final String orgEntry = orgHeader + commentline + orgBody;
-        try {
-            OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
-            OrgFile orgFile2 = OrgFile.createFromString("test.org", orgFile1.treeToString());
-            OrgFile orgFile3 = OrgFile.createFromString("test.org",
-                    orgFile2.treeToString());
-            assertEquals(orgBody, orgFile3.getSubNodes().get(0).getBody());
-            assertEquals(commentline, orgFile3.getSubNodes().get(0).getComments());
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(e.getLocalizedMessage(), false);
-        }
-
-    }
-
-    @Test
-    public void testRepeatedParsedBodies() {
-        // Check if body grows
-      final String orgBody = "A simple body\nConsisting of a few paragraphs\n\nThe third of which, is separated by three newlines\n\n\nAnd ends with just one.\n";
-        final String orgEntry = "* Simple header\n" + orgBody;
-
-        try {
-            OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
-            OrgFile orgFile2 = OrgFile.createFromString("test.org", orgFile1.treeToString());
-            OrgFile orgFile3 = OrgFile.createFromString("test.org",
-                    orgFile2.treeToString());
-            assertEquals(orgBody, orgFile3.getSubNodes().get(0).getBody());
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(e.getLocalizedMessage(), false);
-        }
-    }
-
-    @Test
-    public void testItemGrowth() {
-        // Check if body grows
-        final String h1 = "* Header one\n";
-        final String b1 = "Body of\nitem one should not\ngrow\n";
-        final String h2 = "* Header two\n";
-        final String b2 = "Body of\nitem two should not\ngrow either\n";
-        final String orgEntry = h1 + b1 + "\n" + h2 + b2;
-
-        try {
-            OrgFile orgFile1 = OrgFile.createFromString("test.org", orgEntry);
-            OrgFile orgFile2 = OrgFile.createFromString("test.org", orgFile1.treeToString());
-            OrgFile orgFile3 = OrgFile.createFromString("test.org",
-                    orgFile2.treeToString());
-            assertEquals(h1, orgFile3.getSubNodes().get(0).getOrgHeader() +
-                             "\n");
-            assertEquals(b1, orgFile3.getSubNodes().get(0).getBody());
-            assertEquals(h2, orgFile3.getSubNodes().get(1).getOrgHeader() +
-                             "\n");
-            assertEquals(b2, orgFile3.getSubNodes().get(1).getBody());
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(e.getLocalizedMessage(), false);
-        }
-    }
-
-    @Test
-    public void testCommentPrefix() {
-        String commentline = "# NONSENSEID= 24SFS2";
-        Matcher mc = OrgParser.getCommentPrefix().matcher(commentline);
-        assertTrue(mc.matches());
-
-        commentline = "   # NONSENSEID= 24SFS2  ";
-        mc = OrgParser.getCommentPrefix().matcher(commentline);
-        assertTrue(mc.matches());
-
-        commentline = "# NONSENSEID= 24SFS2  \n";
-        mc = OrgParser.getCommentPrefix().matcher(commentline);
-        assertTrue(mc.matches());
-    }
-
-    @Test
-    public void testComments() {
-        OrgNode node = new OrgNode();
-        final String commentline = "# NONSENSEID= 24SFS2";
-        final String normalline = "Bob bob";
-        try {
-            node.addBodyLine(commentline);
-            node.addBodyLine(normalline);
-
-            assertEquals(commentline + "\n", node.getComments());
-            assertEquals(normalline + "\n", node.getBody());
-
-        } catch (ParseException e) {
-            assertTrue(false);
-        }
-
-    }
-
-    @Test
-    public void testDefaultHeaderPattern() {
-        Pattern p = OrgParser.getHeaderPattern();
-        Matcher m = p.matcher("* BOB A simple title :bob:alice:");
-        assertTrue(m.matches());
-        assertEquals(m.group(OrgParser.HEADER_STARS_GROUP), "*");
-        assertEquals(m.group(OrgParser.HEADER_TITLE_GROUP), "BOB A simple title");
-        assertNull(m.group(OrgParser.HEADER_TODO_GROUP));
-        assertEquals(m.group(OrgParser.HEADER_TAGS_GROUP), ":bob:alice:");
-    }
-
-    @Test
-    public void testHeaderPatternTODO() {
-        Pattern p = OrgParser.getHeaderPattern("BOB");
-        Matcher m = p.matcher("* BOB A simple title :bob:alice:");
-        assertTrue(m.matches());
-        assertEquals(m.group(OrgParser.HEADER_STARS_GROUP), "*");
-        assertEquals(m.group(OrgParser.HEADER_TITLE_GROUP), "A simple title");
-        assertEquals(m.group(OrgParser.HEADER_TODO_GROUP), "BOB");
-        assertEquals(m.group(OrgParser.HEADER_TAGS_GROUP), ":bob:alice:");
-    }
-
-
-
+public class OrgTimestampTest {
     @Test
     public void testTimestampPatternFull() {
         Pattern p = OrgParser.getTimestampPattern();
@@ -585,23 +333,4 @@ public class OrgTests {
         }
         assertEquals(30, ts.getDate().getMinuteOfHour());
     }
-
-  /*
-    public static void main(String[] args) {
-      //print("testing");
-      //print(OrgParser.getHeaderPattern("NEXT").toString());
-      //print(OrgParser.parseTags(":bob:alice:sting:").length);
-      //print(OrgParser.parseTags(":bob:alice:sting:"));
-      Pattern p = OrgParser.getHeaderPattern("NEXT");
-      Matcher m = p.matcher("* NEXT A simple title :bob:alice:");
-      while (m.find()) {
-        //print(m.group());
-        print("Stars: ", m.group(OrgParser.HEADER_STARS_GROUP));
-        print("Title: ", m.group(OrgParser.HEADER_TITLE_GROUP));
-        print("Todo: ", m.group(OrgParser.HEADER_TODO_GROUP));
-        print("Tags: ", m.group(OrgParser.HEADER_TAGS_GROUP));
-      }
-
-      testfile();
-      }*/
 }

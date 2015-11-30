@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2015 Jonas Kalderstam
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.cowboyprogrammer.org;
 
 import org.junit.Test;
@@ -6,10 +23,13 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 public class OrgTimestampRangeTest {
+
     @Test
     public void testTimestampRangePattern() {
         Pattern p = OrgParser.getTimestampRangePattern();
@@ -47,12 +67,10 @@ public class OrgTimestampRangeTest {
         assertEquals(sd, td.toString(Locale.ENGLISH));
 
         // Incomplete ones
-        OrgTimestampRange t1 = OrgTimestampRange
-                .fromString("<2013-12-31 Tue>--<2014-02-28 12:29>");
+        OrgTimestampRange t1 = OrgTimestampRange.fromString("<2013-12-31 Tue>--<2014-02-28 12:29>");
         assertEquals(sd, t1.toString(Locale.ENGLISH));
 
-        OrgTimestampRange t2 = OrgTimestampRange
-                .fromString("<2013-12-31 13:25>--<2014-02-28>");
+        OrgTimestampRange t2 = OrgTimestampRange.fromString("<2013-12-31 13:25>--<2014-02-28>");
         assertEquals(sd, t2.toString(Locale.ENGLISH));
 
     }
