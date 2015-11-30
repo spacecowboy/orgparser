@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.cowboyprogrammer:orgparser:1.1'
+    compile 'org.cowboyprogrammer:orgparser:1.2'
 }
 #+end_src
 
@@ -69,10 +69,11 @@ some subnodes:
 
 When a file is parsed a recursive structure of nodes is created. The
 root is always an OrgFile object. You parse a file by calling the
-static *createFrom* method of the OrgFile class:
+static *createFrom* method of the OrgFile class, giving it the
+parser you wish to use (currently there is only one choice here):
 
 #+begin_src java
-OrgFile orgFile = OrgFile.createFrom("/path/to/file.org");
+OrgFile orgFile = OrgFile.createFrom(new RegexParser(), "/path/to/file.org");
 #+end_src
 
 **** Header parts
