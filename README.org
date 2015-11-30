@@ -1,5 +1,7 @@
 #+begin_html
 <a href='https://bintray.com/spacecowboy/maven/org.cowboyprogrammer%3Aorgparser/_latestVersion'><img src='https://api.bintray.com/packages/spacecowboy/maven/org.cowboyprogrammer%3Aorgparser/images/download.svg'></a>
+
+<a href='https://travis-ci.org/spacecowboy/NotePad'><img src='https://travis-ci.org/spacecowboy/NotePad.svg?branch=master'></a>
 #+end_html
 
 * orgparser
