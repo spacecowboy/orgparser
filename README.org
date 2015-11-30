@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.cowboyprogrammer:orgparser:1.2'
+    compile 'org.cowboyprogrammer:orgparser:1.2.1'
 }
 #+end_src
 
