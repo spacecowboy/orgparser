@@ -85,7 +85,7 @@ public class OrgTimestampRange {
         return sb.toString();
     }
 
-    public boolean isHasTime() {
+    public boolean hasTime() {
         return hasTime;
     }
 
