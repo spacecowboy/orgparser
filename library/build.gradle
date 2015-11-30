@@ -3,25 +3,22 @@ apply plugin: 'java'
 // com.android.library)
 apply plugin: 'bintray-release'
 
-// query git for the the SHA, Tag and commit count. Use these to automate versioning.
+// query git for the Tag. Use this to automate versioning.
 def gitTag = 'git describe --tags'.execute([], project.rootDir).text.trim()
-def gitCommitCount =
-        Integer.parseInt('git rev-list --count HEAD'.execute([], project.rootDir).text.trim())
-
 
 dependencies {
-  compile 'joda-time:joda-time:2.3'
-  testCompile 'junit:junit:4.12'
+    compile 'joda-time:joda-time:2.3'
+    testCompile 'junit:junit:4.12'
 }
 
 publish {
-    groupId = GROUP
-    artifactId = POM_ARTIFACT_ID
-    publishVersion = VERSION_NAME
-    description = POM_DESCRIPTION
-    website = POM_URL
+    groupId = 'org.cowboyprogrammer'
+    artifactId = 'orgparser'
+    publishVersion = gitTag
+    description = 'A java library for parsing Org-mode files.'
+    website = 'https://github.com/spacecowboy/orgparser'
     licences = ['GPL-3.0']
-    uploadName = PROJECT_NAME
-  bintrayUser = project.hasProperty("BINTRAY_USER")? BINTRAY_USER: "Dummy"
-  bintrayKey = project.hasProperty("BINTRAY_KEY") ? BINTRAY_KEY: "Dummy"
+    uploadName = 'org.cowboyprogrammer:orgparser'
+    bintrayUser = project.hasProperty("BINTRAY_USER") ? BINTRAY_USER : "Dummy"
+    bintrayKey = project.hasProperty("BINTRAY_KEY") ? BINTRAY_KEY : "Dummy"
 }
