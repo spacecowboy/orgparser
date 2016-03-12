@@ -22,3 +22,24 @@ publish {
     bintrayUser = project.hasProperty("BINTRAY_USER") ? BINTRAY_USER : "Dummy"
     bintrayKey = project.hasProperty("BINTRAY_KEY") ? BINTRAY_KEY : "Dummy"
 }
+
+
+test {
+  testLogging {
+    // Make sure output from
+    // standard out or error is shown
+    // in Gradle output.
+    showStandardStreams = false
+
+    // Or we use events method:
+    // events 'standard_out', 'standard_error'
+
+    // Or set property events:
+    // events = ['standard_out', 'standard_error']
+
+    // Instead of string values we can
+    // use enum values:
+    // events org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
+    //        org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR,
+  }
+}

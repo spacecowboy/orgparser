@@ -66,7 +66,7 @@ public class OrgFileTest {
     }
 
     private File getFile(String path) throws Exception {
-        return new File(getClass().getResource(path).getFile());
+        return new File(getClass().getResource(path).toURI());
     }
 
     private void writeToFile(File file, OrgFile root) throws IOException {
