@@ -6,13 +6,6 @@ apply plugin: 'com.novoda.bintray-release'
 // query git for the Tag. Use this to automate versioning.
 def gitTag = 'git describe --tags'.execute([], project.rootDir).text.trim()
 
-task copyTestResources(type: Copy) {
-  from "${projectDir}/src/test/resources"
-  into "${buildDir}/classes/test"
-
-}
-processTestResources.dependsOn copyTestResources
-
 dependencies {
     compile 'joda-time:joda-time:2.3'
     testCompile 'junit:junit:4.12'
