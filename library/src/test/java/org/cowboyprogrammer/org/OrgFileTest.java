@@ -28,7 +28,7 @@ import java.util.Collection;
 
 
 public class OrgFileTest {
-    private static final String TESTFILEPATH = "file/test.org";
+    private static final String TESTFILEPATH = "test.org";
 
     private static void print(final Collection<String> strings) {
         for (final String s : strings) {
@@ -66,7 +66,7 @@ public class OrgFileTest {
     }
 
     private File getFile(String path) throws Exception {
-        return new File(getClass().getClassLoader().getResource(path).getFile());
+        return new File(getClass().getResource(path).getFile());
     }
 
     private void writeToFile(File file, OrgFile root) throws IOException {
