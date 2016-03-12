@@ -9,7 +9,7 @@ node {
   // Archive test results
   step([$class: 'JUnitResultArchiver', testResults: '**/build/test-results/TEST-*.xml'])
   // Archive PMD results
-  step([$class: 'PmdPublisher'])
+  step([$class: 'PmdPublisher', pattern: '**/pmd/*.xml'])
 }
 
 def test() {
