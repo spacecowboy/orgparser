@@ -3,25 +3,25 @@
 Changelog of Orgparser
 
 {{#tags}}
-  ## [{{name}}](https://github.com/spacecowboy/orgparser/releases/tag/{{name}})
+## [{{name}}](https://github.com/spacecowboy/orgparser/releases/tag/{{name}})
   {{#issues}}
-	{{#hasIssue}}
-	  {{#hasLink}}
-	    ### [{{issue}}]({{link}}) {{title}}
+    {{#hasIssue}}
+      {{#hasLink}}
+### [{{issue}}]({{link}}) {{title}}
 	  {{/hasLink}}
 	  {{^hasLink}}
-	    ### {{issue}} {{title}}
+### {{issue}} {{title}}
 	  {{/hasLink}}
 	{{/hasIssue}}
 
 	{{#commits}}
-	  **{{{messageTitle}}}**
+**{{{messageTitle}}}**
 
 	  {{#messageBodyItems}}
-	    * {{.}}
+* {{.}}
 	  {{/messageBodyItems}}
 
-	  [{{hash}}](https://github.com/spacecowboy/orgparser/commit/{{hash}}) {{authorName}} *{{commitTime}}*
+[{{hash}}](https://github.com/spacecowboy/orgparser/commit/{{hash}}) {{authorName}} *{{commitTime}}*
 
 	{{/commits}}
 
