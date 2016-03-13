@@ -1,0 +1,5 @@
+{
+    "fromRepo": ".",
+    "gitHubApi": "https://api.github.com/repos/spacecowboy/orgparser",
+    "ignoreCommitsIfMessageMatches": "^Merge.*$|^((?!#[0-9]).)*$"
+}
