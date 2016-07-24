@@ -8,7 +8,7 @@ buildscript {
     }
   }
   dependencies {
-    //    classpath 'com.novoda:bintray-release:0.3.4'
+    classpath 'com.novoda:bintray-release:0.3.4'
     classpath "gradle.plugin.se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.21"
     classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.9'
   }
