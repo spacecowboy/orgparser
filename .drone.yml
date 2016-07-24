@@ -1,6 +1,6 @@
 pipeline:
   build:
-    image: java:openjdk-7
+    image: java:openjdk-8
     environment:
       - GRADLE_USER_HOME=~/.gradle
     commands:
