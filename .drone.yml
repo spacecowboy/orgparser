@@ -5,4 +5,4 @@ pipeline:
       - GRADLE_USER_HOME=~/.gradle
     commands:
       - ./gradlew assemble
-      - ./gradlew check
+      - ./gradlew check pitest
