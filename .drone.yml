@@ -4,4 +4,5 @@ pipeline:
     environment:
       - GRADLE_USER_HOME=~/.gradle
     commands:
+      - ./gradlew assemble
       - ./gradlew check
