@@ -1,0 +1,7 @@
+pipeline:
+  build:
+    image: java:openjdk-7
+    environment:
+      - GRADLE_USER_HOME=~/.gradle
+    commands:
+      - ./gradlew check
