@@ -8,8 +8,8 @@ buildscript {
     }
   }
   dependencies {
-    classpath 'com.novoda:bintray-release:0.3.4'
-    classpath "gradle.plugin.se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.21"
+    //    classpath 'com.novoda:bintray-release:0.3.4'
+    //    classpath "gradle.plugin.se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.21"
     classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.9'
   }
 }
@@ -24,6 +24,7 @@ task wrapper(type: Wrapper) {
   gradleVersion = '2.11'
 }
 
+/*
 apply plugin: "se.bjurr.gitchangelog.git-changelog-gradle-plugin"
 
 task changelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
@@ -31,3 +32,4 @@ task changelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
   settingsFile = ".changelog.json";
   templateContent = new File('.changelog.mustache').getText('UTF-8');
 }
+*/
