@@ -1,0 +1,8 @@
+pipeline:
+  build:
+    image: java:openjdk-8
+    environment:
+      - GRADLE_USER_HOME=~/.gradle
+    commands:
+      - ./gradlew assemble
+      - ./gradlew check pitest
