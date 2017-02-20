@@ -2,6 +2,16 @@
 
 Changelog of Orgparser
 
+## [1.3.1](https://github.com/spacecowboy/orgparser/releases/tag/1.3.1)
+### [#7](https://github.com/spacecowboy/orgparser/issues/7) Incomplete switch in OrgTimestamp::toString
+
+**List all cases in switch**
+
+* fixes #7
+
+[fa13d982dfd834b](https://github.com/spacecowboy/orgparser/commit/fa13d982dfd834b) Jonas Kalderstam *2017-02-20 15:52:10*
+
+
 ## [1.3.0](https://github.com/spacecowboy/orgparser/releases/tag/1.3.0)
 ### [#3](https://github.com/spacecowboy/orgparser/issues/3) Add getParser method to OrgNode
 
@@ -20,5 +30,3 @@ Changelog of Orgparser
 * also fixes #2
 
 [5fbcfda34ccb25e](https://github.com/spacecowboy/orgparser/commit/5fbcfda34ccb25e) Jonas Kalderstam *2015-11-30 21:14:18*
-
-
