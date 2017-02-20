@@ -89,10 +89,9 @@ public class OrgTimestamp {
         }
 
         if (null != type) {
-            final String t = type;
-            if (t.equals("DEADLINE")) {
+            if (type.equals("DEADLINE")) {
                 this.type = Type.DEADLINE;
-            } else if (t.equals("SCHEDULED")) {
+            } else if (type.equals("SCHEDULED")) {
                 this.type = Type.SCHEDULED;
             }
         }

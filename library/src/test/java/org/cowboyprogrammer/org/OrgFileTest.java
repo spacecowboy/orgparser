@@ -26,8 +26,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 
-import static org.junit.Assert.fail;
-
 public class OrgFileTest {
     private static final String TESTFILEPATH = "test.org";
 
@@ -64,12 +62,6 @@ public class OrgFileTest {
         }
 
         writeToFile(File.createTempFile("test-out", ".org"), root);
-    }
-
-    @Test
-    public void tesfFail() {
-        // This test fails
-        //fail();
     }
 
     private File getFile(String path) throws Exception {
