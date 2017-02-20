@@ -38,7 +38,7 @@ public class OrgTimestamp {
     public static final DateTimeFormatter INTIMEFORMAT = DateTimeFormat
             .forPattern("HH:mm");
 
-    public static enum Type {
+    public enum Type {
         PLAIN, DEADLINE, SCHEDULED
     }
 
@@ -262,6 +262,9 @@ public class OrgTimestamp {
                 break;
             case SCHEDULED:
                 sb.append("SCHEDULED: ");
+                break;
+            case PLAIN:
+            default:
                 break;
         }
 
