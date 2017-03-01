@@ -24,6 +24,10 @@ task wrapper(type: Wrapper) {
   gradleVersion = '3.4'
 }
 
+tasks.withType(JavaCompile) {
+   options.incremental = true
+}
+
 apply plugin: "se.bjurr.gitchangelog.git-changelog-gradle-plugin"
 
 task changelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
