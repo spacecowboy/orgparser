@@ -1,4 +1,4 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'pmd'
 apply plugin: 'info.solidsoft.pitest'
 // must be applied after your artifact generating plugin (eg. java /
@@ -12,8 +12,8 @@ def gitTag = 'git describe --tags'.execute([], project.rootDir).text.trim()
 group = "org.cowboyprogrammer"
 
 dependencies {
-    compile 'joda-time:joda-time:2.3'
-    testCompile 'junit:junit:4.12'
+    api 'joda-time:joda-time:2.3'
+    testImplementation 'junit:junit:4.12'
 }
 
 publish {

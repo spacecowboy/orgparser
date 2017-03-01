@@ -21,7 +21,7 @@ allprojects {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.11'
+  gradleVersion = '3.4'
 }
 
 apply plugin: "se.bjurr.gitchangelog.git-changelog-gradle-plugin"
