@@ -2,36 +2,21 @@
 
 buildscript {
   repositories {
-    jcenter()
     maven {
       url "https://plugins.gradle.org/m2/"
     }
   }
   dependencies {
-    classpath 'com.novoda:bintray-release:0.3.4'
-    classpath "gradle.plugin.se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.21"
     classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.9'
   }
 }
 
 allprojects {
   repositories {
-    jcenter()
+    mavenCentral()
   }
-}
-
-task wrapper(type: Wrapper) {
-  gradleVersion = '3.4'
 }
 
 tasks.withType(JavaCompile) {
    options.incremental = true
-}
-
-apply plugin: "se.bjurr.gitchangelog.git-changelog-gradle-plugin"
-
-task changelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
-  filePath = "CHANGELOG.md"
-  settingsFile = ".changelog.json"
-  templateContent = new File('.changelog.mustache').getText('UTF-8')
 }

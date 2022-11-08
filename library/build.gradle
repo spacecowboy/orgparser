@@ -1,31 +1,12 @@
 apply plugin: 'java-library'
 apply plugin: 'pmd'
 apply plugin: 'info.solidsoft.pitest'
-// must be applied after your artifact generating plugin (eg. java /
-// com.android.library)
-apply plugin: 'com.novoda.bintray-release'
-
-// query git for the Tag. Use this to automate versioning.
-def gitTag = 'git describe --tags'.execute([], project.rootDir).text.trim()
-
-// Needed for pitest
-group = "org.cowboyprogrammer"
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 dependencies {
     api 'joda-time:joda-time:2.3'
     testImplementation 'junit:junit:4.12'
-}
-
-publish {
-    groupId = 'org.cowboyprogrammer'
-    artifactId = 'orgparser'
-    publishVersion = gitTag
-    description = 'A java library for parsing Org-mode files.'
-    website = 'https://github.com/spacecowboy/orgparser'
-    licences = ['GPL-3.0']
-    uploadName = 'org.cowboyprogrammer:orgparser'
-    bintrayUser = project.hasProperty("BINTRAY_USER") ? BINTRAY_USER : "Dummy"
-    bintrayKey = project.hasProperty("BINTRAY_KEY") ? BINTRAY_KEY : "Dummy"
 }
 
 pitest {
@@ -51,4 +32,70 @@ test {
     // events org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
     //        org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR,
   }
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "localFile"
+            url = "file://${buildDir}/repo"
+        }
+        maven {
+            name = "mavenCentral"
+            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            credentials {
+                username findProperty("nexusUsername")
+                password findProperty("nexusPassword")
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            groupId = 'org.cowboyprogrammer.orgparser'
+            artifactId = 'orgparser'
+            version = version
+
+            // artifact("$buildDir/libs/${project.getName()}-release.aar")
+            artifact jar
+            artifact javadocJar
+            artifact sourcesJar
+
+            pom {
+                name = "OrgParser"
+                description = "A Java parser for org-mode files."
+                url = "https://github.com/spacecowboy/orgparser"
+                licenses {
+                    license {
+                        name = "GNU GENERAL PUBLIC LICENSE Version 3.0"
+                        url = "https://www.gnu.org/licenses/gpl-3.0.html"
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/spacecowboy/orgparser.git"
+                    developerConnection = "scm:git:ssh://git@github.com:spacecowboy/orgparser.git"
+                    url = "https://github.com/spacecowboy/orgparser"
+                }
+            }
+        }
+    }
+}
+
+signing {
+  // You may have to create a dummy script called gpg2 which exec /usr/bin/gpg
+    useGpgCmd()
+    sign publishing.publications.maven
 }
