@@ -56,7 +56,7 @@ publishing {
         }
         maven {
             name = "mavenCentral"
-            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
             credentials {
                 username findProperty("nexusUsername")
                 password findProperty("nexusPassword")
@@ -78,6 +78,13 @@ publishing {
                 name = "OrgParser"
                 description = "A Java parser for org-mode files."
                 url = "https://github.com/spacecowboy/orgparser"
+                developers {
+                    developer {
+                        id = 'spacecowboy'
+                        name = 'Space Cowboy'
+                        email = 'spacecowboy@cowboyprogrammer.org'
+                    }
+                }
                 licenses {
                     license {
                         name = "GNU GENERAL PUBLIC LICENSE Version 3.0"
